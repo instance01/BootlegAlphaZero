@@ -22,6 +22,7 @@ def get_params(env):
         "horizon": 100,
         "dirichlet_alpha": .3,
         "dirichlet_frac": .25,
+        "pb_c_base": 50,
 
         # A2C
         "alpha": .01,  # .01 (AlphaZero best); .001 (Imitation best)
@@ -179,6 +180,59 @@ def get_params(env):
         "dirichlet_frac": .25
     })
 
+    params17 = copy.deepcopy(params1)
+    params17.update({
+        "alpha": .0002,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 2000,
+        "dirichlet_alpha": .9,
+        "dirichlet_frac": .25
+    })
+
+    params18 = copy.deepcopy(params1)
+    params18.update({
+        "alpha": .0002,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 2000,
+        "dirichlet_alpha": .4,
+        "dirichlet_frac": .25
+    })
+
+    params19 = copy.deepcopy(params1)
+    params19.update({
+        "alpha": .0002,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 2000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params20 = copy.deepcopy(params1)
+    params20.update({
+        "alpha": .0002,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 2000,
+        "pb_c_base": 10
+    })
+
+    params21 = copy.deepcopy(params1)
+    params21.update({
+        "alpha": .0002,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 2000,
+        "pb_c_base": 100
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -196,6 +250,11 @@ def get_params(env):
         "14": params14,
         "15": params15,
         "16": params16,
+        "17": params17,
+        "18": params18,
+        "19": params19,
+        "20": params20,
+        "21": params21,
     }
 
 
@@ -281,10 +340,27 @@ Params12:  # Since it's the best one so far. (12_1)
 Minutes: 255.10599056879678
 
 Params15:
-Running
+[63, 11, 11, 6, 38, 2, 99, 31, 99, 99]
+Minutes: 624.9840517878532
 
 Params16:
-Running
+[2, 33, 11, 1, 22, 29, 1, 40, 99, 8]
+Minutes: 376.4243238766988
+
+Params17:
+Running.
+
+Params18:
+Running.
+
+Params19:
+Running.
+
+Params20:
+Running.
+
+Params21:
+Running.
 
 """
 
