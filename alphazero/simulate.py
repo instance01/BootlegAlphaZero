@@ -367,6 +367,16 @@ Params21:
 [3, 26, 99, 56, 2, 1, 4, 20, 18, 91]
 Minutes: 321.5921831091245
 
+Params12_again:
++multiprocessing numpy seed fix
+[37, 99, 9, 10, 13, 6, 11, 21, 7, 17]
+Minutes: 145.70517488718033
+
+Params19_again:
++multiprocessing numpy seed fix
+[5, 17, 10, 2, 2, 3, 1, 9, 10, 2]
+Minutes: 57.76622135241826
+
 """
 
 
