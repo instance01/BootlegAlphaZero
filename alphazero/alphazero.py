@@ -1,3 +1,4 @@
+import os
 import time
 import sys
 import copy
@@ -74,6 +75,13 @@ def one_hot_encode(action, actions_len):
 
 
 def run_actor(env, params, mcts_agent, a2c_agent):
+    # Since we're running in parallel.
+    np.random.seed(int.from_bytes(os.urandom(4), byteorder='little'))
+    # TODO: Is that even needed?
+    env = copy.deepcopy(env)
+    mcts_agent = copy.deepcopy(mcts_agent)
+    a2c_agent = copy.deepcopy(a2c_agent)
+
     # TODO REMOVE
     mcts_actions = ""
 
