@@ -75,7 +75,7 @@ class MCTS:
         return mean_q + prior_score
 
     def _gen_children_nodes(self, parent_node):
-        for action in parent_node.env.actions:
+        for action in list(range(self.params['n_actions'])):
             env = copy.copy(parent_node.env)
             obs, reward, done, _ = env.step(action)
             node = Node()
@@ -183,8 +183,9 @@ class MCTS:
             # TODO Get actions_len from params
             alpha = self.dirichlet_alpha
             frac = self.dirichlet_frac
-            noise = np.random.gamma(alpha, 1, len(self.env.actions))
-            for a, n in zip(self.env.actions, noise):
+            noise = np.random.gamma(alpha, 1, self.params['n_actions'])
+            actions = list(range(self.params['n_actions']))
+            for a, n in zip(actions, noise):
                 action_probs[a] = action_probs[a] * (1 - frac) + n * frac
             self.policy_net_cache[key] = [action_probs]
 
