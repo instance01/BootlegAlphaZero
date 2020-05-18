@@ -221,4 +221,4 @@ def run(env, params, desired_eval_len, n_run, writer=None):
             is_done_stably = 0
         if is_done_stably > 5:
             break
-    return i
+    return i, eval_len

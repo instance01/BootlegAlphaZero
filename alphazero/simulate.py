@@ -22,7 +22,7 @@ def get_params(env):
         "gamma": .99,
         "c": 1.,  # .001  # TODO Using puct now
         "simulations": 50,  # 1000
-        "horizon": 100,
+        "horizon": 200,
         "dirichlet_alpha": .3,
         "dirichlet_frac": .25,
         "pb_c_base": 50,
@@ -335,6 +335,39 @@ def get_params(env):
         "dirichlet_frac": .5
     })
 
+    params31 = copy.deepcopy(params1)
+    params31.update({
+        "alpha": .005,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 20,
+        "train_steps": 4000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params32 = copy.deepcopy(params1)
+    params32.update({
+        "alpha": .01,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 20,
+        "train_steps": 4000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params33 = copy.deepcopy(params1)
+    params33.update({
+        "alpha": .05,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 20,
+        "train_steps": 4000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -366,6 +399,9 @@ def get_params(env):
         "28": params28,
         "29": params29,
         "30": params30,
+        "31": params31,
+        "32": params32,
+        "33": params33,
     }
 
 
@@ -497,37 +533,87 @@ Params23:
 Params24:
     EVAL 1202212 0.7708295649609999
     Minutes: 76.87422110637029
+    Rerun:
     +dont quadruple rewards
     +do 10 runs (from now on charts)
-    Running
+    Cancelled after 3 runs. Did not learn anything stable.
+    May18_11-50-53_amazonit.cip.ifi.lmu.de
 
 Params25:
     EVAL 1202212 0.7708295649609999
     Minutes: 59.53636395931244
-    Running
+    Rerun:
+    +dont quadruple rewards
+    +do 10 runs (from now on charts)
+    Cancelled after 4 runs. Did not learn anything stable.
+    May18_11-49-16_amazonit.cip.ifi.lmu.de
 
 Params26:
     EVAL 1202212 0.7708295649609999
     Minutes: 120.59210259517035
-    Running
+    Rerun:
+    +dont quadruple rewards
+    +do 10 runs (from now on charts)
+    Cancelled after 4 runs. Learnt something a bit stable once. All other
+    times, did not learn anything. Very slow.
+    May18_11-57-17_beryll.cip.ifi.lmu.de
 
 Params27:
     EVAL 1202212 0.7708295649609999
     Minutes: 134.39488005638123
-    Running
+    Rerun:
+    +dont quadruple rewards
+    +do 10 runs (from now on charts)
+    Cancelled after 3 runs. Did not learn anything stable.
+    May18_14-01-25_beryll.cip.ifi.lmu.de
 
 Params28:
     EVAL 122022 0.8008746470559999
     Minutes: 65.5352343996366
+    Rerun:
+    +dont quadruple rewards
+    +do 10 runs (from now on charts)
     May18_11-51-21_danburit.cip.ifi.lmu.de
     Minutes: 218.93244425058364
     9/10 learnt successfully, 1/10 did not learn.
 
 Params29:
-    Running
+    Cancelled after 2 runs. Did not learn and much too slow.
+    May18_17-03-06_danburit.cip.ifi.lmu.de
 
 Params30:
+    Cancelled after 1 run. Did not learn and much too slow.
+    May18_17-07-36_danburit.cip.ifi.lmu.de
+
+Params31:
+    Cancelled after 1 run. Did not learn and much too slow.
+    May18_18-24-02_danburit.cip.ifi.lmu.de
+
+Params19_again:
+    +factorize rewards with 8
+    Minutes: 77.49310787518819
+    Learnt 10/10.
+    May18_18-56-37_sodalith.cip.ifi.lmu.de
+
+Params19_again:
+    +8x8
+    Cancelled after 2 runs, did not learn. Will first explore 5x5 some more.
+    May18_19-26-47_sodalith.cip.ifi.lmu.de
+
+Params19_again: // just to test summary tensorboard (justatest)
+    -8x8
+    -factorize rewards with 8
     Running
+    May18_22-36-39_sodalith.cip.ifi.lmu.de
+
+Params28_again:
+    Running
+
+Params32:
+    Runing
+
+Params33:
+    Runing
 
 """
 
@@ -558,6 +644,7 @@ class Action(Enum):
 def simulate_many_minigrid():
     start_time = time.time()
     env = gym.make('MiniGrid-Empty-5x5-v0')
+    # env = gym.make('MiniGrid-Empty-8x8-v0')
     desired_len = 8
 
     # Monkey patch actions, step and reset.
@@ -574,6 +661,7 @@ def simulate_many_minigrid():
         obs, reward, done, _ = cls._step(action)
         # TODO An idea was to quadruple reward to make good rewards more
         # important.
+        # return obs['image'].flatten(), reward ** 8, done, None
         return obs['image'].flatten(), reward, done, None
     env._step = env.step
     env.__class__._step = env.__class__.step
@@ -596,7 +684,13 @@ def simulate_many_minigrid():
     params["n_input_features"] = 147
 
     writer = SummaryWriter()
-    [alphazero.run(env, params, desired_len, i, writer) for i in range(10)]
+    for i in range(10):
+        # TODO Also return last reward and add it to summary.
+        episodes, last_eval_len = alphazero.run(
+            env, params, desired_len, i, writer
+        )
+        writer.add_scalar('Summary/Length_All', last_eval_len, i)
+        writer.add_scalar('Summary/Episodes_All', episodes, i)
     print("Minutes:", (time.time() - start_time) / 60.)
 
 
