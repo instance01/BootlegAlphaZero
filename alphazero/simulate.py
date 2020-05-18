@@ -2,11 +2,14 @@
 import sys
 import time
 import copy
+from enum import Enum
 
 import gym
 
 import mini_discrete_env  # noqa: F401
+import gym_minigrid  # noqa: F401
 import alphazero
+from torch.utils.tensorboard import SummaryWriter
 
 
 def get_params(env):
@@ -233,6 +236,83 @@ def get_params(env):
         "pb_c_base": 100
     })
 
+    params22 = copy.deepcopy(params1)
+    params22.update({
+        "alpha": .0001,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 1000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params23 = copy.deepcopy(params1)
+    params23.update({
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 1000,
+        "dirichlet_alpha": .2,
+        "dirichlet_frac": .4
+    })
+
+    params24 = copy.deepcopy(params1)
+    params24.update({
+        "alpha": .00005,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 2000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params25 = copy.deepcopy(params1)
+    params25.update({
+        "alpha": .00005,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 1000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params26 = copy.deepcopy(params1)
+    params26.update({
+        "alpha": .00005,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 3000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params27 = copy.deepcopy(params1)
+    params27.update({
+        "alpha": .0002,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 3000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params28 = copy.deepcopy(params1)
+    params28.update({
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 3000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -255,6 +335,13 @@ def get_params(env):
         "19": params19,
         "20": params20,
         "21": params21,
+        "22": params22,
+        "23": params23,
+        "24": params24,
+        "25": params25,
+        "26": params26,
+        "27": params27,
+        "28": params28,
     }
 
 
@@ -377,10 +464,43 @@ Params19_again:
 [5, 17, 10, 2, 2, 3, 1, 9, 10, 2]
 Minutes: 57.76622135241826
 
+Params22:
+just testing Gridworld
+
+Params23:
+just testing Gridworld
+
+Params24:
+EVAL 1202212 0.7708295649609999
+Minutes: 76.87422110637029
++dont quadruple rewards
++do 10 runs (from now on charts)
+Running
+
+Params25:
+EVAL 1202212 0.7708295649609999
+Minutes: 59.53636395931244
+Running
+
+Params26:
+EVAL 1202212 0.7708295649609999
+Minutes: 120.59210259517035
+Running
+
+Params27:
+EVAL 1202212 0.7708295649609999
+Minutes: 134.39488005638123
+Running
+
+Params28:
+EVAL 122022 0.8008746470559999
+Minutes: 65.5352343996366
+Running
+
 """
 
 
-if __name__ == '__main__':
+def simulate_many_minidiscrete():
     env = gym.make('MiniDiscreteEnv-v0')
     env.goal_pos = [3, -3]  # [2,-2]
     env.borders = [7, -7]  # [5,-5]
@@ -391,6 +511,66 @@ if __name__ == '__main__':
     params = get_params(env)[key]
 
     start_time = time.time()
-    lens = [alphazero.run(env, params, desired_len) for _ in range(10)]
-    print(lens)
+    episodes = [alphazero.run(env, params, desired_len, i) for i in range(10)]
+    print(episodes)
     print("Minutes:", (time.time() - start_time) / 60.)
+
+
+# TODO This should not be global, but it's needed for multiprocessing.
+class Action(Enum):
+    left = 0
+    right = 1
+    forward = 2
+
+
+def simulate_many_minigrid():
+    start_time = time.time()
+    env = gym.make('MiniGrid-Empty-5x5-v0')
+    desired_len = 8
+
+    # Monkey patch actions, step and reset.
+    # TODO Seems a bit hacky.
+    actions = {
+        0: Action.left,
+        1: Action.right,
+        2: Action.forward
+    }
+    env.actions = Action
+
+    def step(cls, action):
+        action = actions[action]
+        obs, reward, done, _ = cls._step(action)
+        # TODO An idea was to quadruple reward to make good rewards more
+        # important.
+        return obs['image'].flatten(), reward, done, None
+    env._step = env.step
+    env.__class__._step = env.__class__.step
+    env.step = step.__get__(env, env.__class__)
+    env.__class__.step = step.__get__(env, env.__class__)
+
+    def reset(cls):
+        obs = cls._reset()
+        return obs['image'].flatten()
+    env._reset = env.reset
+    env.__class__._reset = env.__class__.reset
+    env.reset = reset.__get__(env, env.__class__)
+    env.__class__.reset = reset.__get__(env, env.__class__)
+
+    # Load params and run AlphaZero.
+    key = sys.argv[1]
+    params = get_params(env)[key]
+    params["key"] = key
+    params["n_actions"] = 3
+    params["n_input_features"] = 147
+
+    writer = SummaryWriter()
+    [alphazero.run(env, params, desired_len, i, writer) for i in range(10)]
+    print("Minutes:", (time.time() - start_time) / 60.)
+
+
+# TODO Refactor simulate* functions.
+
+
+if __name__ == '__main__':
+    simulate_many_minigrid()
+    # simulate_many_minidiscrete()

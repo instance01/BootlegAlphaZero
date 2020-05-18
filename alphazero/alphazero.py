@@ -3,12 +3,14 @@ import time
 import sys
 import copy
 import multiprocessing
+from collections import defaultdict
 
 import numpy as np
-import matplotlib.pyplot as plt
+from torch.utils.tensorboard import SummaryWriter
 
 import a2c
 from mcts import MCTS
+
 
 
 class ReplayBuffer:
@@ -65,7 +67,7 @@ def evaluate(env, a2c_agent):
         total_reward += reward
         actions += str(action)
     print("EVAL", actions, total_reward)
-    return len(actions)
+    return len(actions), total_reward
 
 
 def one_hot_encode(action, actions_len):
@@ -113,6 +115,8 @@ def run_actor(env, params, mcts_agent, a2c_agent):
 
 
 def episode(
+            writer,
+            n_run,
             env,
             mcts_agent,
             a2c_agent,
@@ -128,6 +132,8 @@ def episode(
     # cache here since the net is updated in the previous episode.
     mcts_agent.reset_policy_cache()
 
+    actor_lengths = []
+
     # Run self play games in 4 parallel processes.
     pool = multiprocessing.Pool(processes=4)
     multiple_results = [
@@ -137,53 +143,53 @@ def episode(
     games = ([res.get() for res in multiple_results])
     for game in games:
         replay_buffer.add(game)
+        actor_lengths.append(len(game))
     pool.close()
 
     # Print debug information
-    print(mcts_agent.policy_net_cache)
-    for i in range(10):
-        print(
-            i-5,
-            round(a2c_agent.predict_policy([[i-5, False]])[1].item(), 6),
-            end=' | '
-        )
-    print('')
-    for i in range(10):
-        print(
-            i-5,
-            round(a2c_agent.predict_policy([[i-5, True]])[1].item(), 6),
-            end=' | '
-        )
     print('')
     print(replay_buffer.get_rewards()[-n_actors:])
 
     # Train network after self play.
-    lens = 0
+    samples_used = defaultdict(int)  # TODO REMOVE
+    sample_lens = []
     losses = 0
     for i in range(train_steps):
         samples = replay_buffer.sample()
         for sample in samples:
             loss = a2c_agent.update(*sample)
 
-        actions = [sample[1] for sample in samples]
+        actions = ''.join([str(np.argmax(sample[-1])) for sample in samples])
+        samples_used[actions] += 1
         if i % 10 == 0:
             sys.stdout.write(".")
             sys.stdout.flush()
-        lens += len(actions)
+        sample_lens.append(len(actions))
         losses += loss.item()
+    print("")
+    print(samples_used)
 
     print("")
     print(
         "AVG LENS",
-        lens / train_steps,
+        sum(sample_lens) / train_steps,
         " |AVG LOSS",
         losses / train_steps,
         " |TIME", time.time() - start_time
     )
-    return evaluate(env, a2c_agent)
+    eval_length, total_reward = evaluate(env, a2c_agent)
+    writer.add_scalar('Eval/Length/%d' % n_run, eval_length, n_episode)
+    writer.add_scalar('Eval/Reward/%d' % n_run, total_reward, n_episode)
+    writer.add_histogram('Actor/Sample_length/%d' % n_run, np.array(actor_lengths), n_episode)
+    writer.add_histogram('Train/Samples/%d' % n_run, np.array(sample_lens), n_episode)
+    return eval_length
 
 
-def run(env, params, desired_eval_len=6):
+def run(env, params, desired_eval_len, n_run, writer=None):
+    if not writer:
+        writer = SummaryWriter()
+    writer.add_text('Info/params/%d' % n_run, str(params), 0)
+
     start_time = time.time()
     replay_buffer = ReplayBuffer(params["memory_capacity"], params["prioritized_sampling"])
     a2c_agent = a2c.A2CLearner(params)
@@ -192,8 +198,15 @@ def run(env, params, desired_eval_len=6):
         a2c_agent,
         params
     )
+
+    # Need to have less than or equal desired evaluation length, 5 times in a
+    # row. So we want to have very good paths 3 times in a row.
+    is_done_stably = 0
+
     for i in range(params["episodes"]):
         eval_len = episode(
+            writer,
+            n_run,
             env,
             mcts_agent,
             a2c_agent,
@@ -202,6 +215,10 @@ def run(env, params, desired_eval_len=6):
             params,
             start_time
         )
-        if eval_len == desired_eval_len:
+        if eval_len <= desired_eval_len:
+            is_done_stably += 1
+        else:
+            is_done_stably = 0
+        if is_done_stably > 5:
             break
     return i
