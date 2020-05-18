@@ -313,6 +313,28 @@ def get_params(env):
         "dirichlet_frac": .5
     })
 
+    params29 = copy.deepcopy(params1)
+    params29.update({
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 10,
+        "train_steps": 3000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params30 = copy.deepcopy(params1)
+    params30.update({
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 20,
+        "train_steps": 4000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -342,6 +364,8 @@ def get_params(env):
         "26": params26,
         "27": params27,
         "28": params28,
+        "29": params29,
+        "30": params30,
     }
 
 
@@ -495,6 +519,14 @@ Params27:
 Params28:
     EVAL 122022 0.8008746470559999
     Minutes: 65.5352343996366
+    May18_11-51-21_danburit.cip.ifi.lmu.de
+    Minutes: 218.93244425058364
+    9/10 learnt successfully, 1/10 did not learn.
+
+Params29:
+    Running
+
+Params30:
     Running
 
 """
