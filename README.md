@@ -1,4 +1,4 @@
-<p align="center"><img src=".github/grab0.png"></p>
+<p align="center"><img width=50 src=".github/grab0.png"></p>
 
 For bootleg AlphaZero, results can be seen by going into the directory `alphazero` and executing `tensorboard --logdir runs/`.
 Usually there are 10 runs, e.g. `Eval/Reward/0` up to `Eval/Reward/9`.
