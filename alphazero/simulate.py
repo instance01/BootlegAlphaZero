@@ -2,9 +2,11 @@
 import sys
 import time
 import copy
+import functools
 from enum import Enum
 
 import gym
+import numpy as np
 
 import mini_discrete_env  # noqa: F401
 import gym_minigrid  # noqa: F401
@@ -36,6 +38,9 @@ def get_params(env):
         "episodes": 100,
         "n_actors": 20,  # 5000
         "train_steps": 2000,  # 700000
+
+        # Other
+        "reward_exponent": 1,
 
         # TODO unused right now
         "epsilon": .1,
@@ -368,6 +373,40 @@ def get_params(env):
         "dirichlet_frac": .5
     })
 
+    params34 = copy.deepcopy(params1)
+    params34.update({
+        "alpha": .01,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 10,
+        "train_steps": 1000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params35 = copy.deepcopy(params1)
+    params35.update({
+        "alpha": .01,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 10,
+        "train_steps": 1000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .2
+    })
+
+    params36 = copy.deepcopy(params1)
+    params36.update({
+        "alpha": .01,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 10,
+        "train_steps": 1000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .2,
+        "pb_c_base": 100
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -402,6 +441,9 @@ def get_params(env):
         "31": params31,
         "32": params32,
         "33": params33,
+        "34": params34,
+        "35": params35,
+        "36": params36,
     }
 
 
@@ -590,7 +632,7 @@ Params31:
     May18_18-24-02_danburit.cip.ifi.lmu.de
 
 Params19_again:
-    +factorize rewards with 8
+    +Exponentiate rewards with 8
     Minutes: 77.49310787518819
     Learnt 10/10.
     May18_18-56-37_sodalith.cip.ifi.lmu.de
@@ -602,7 +644,7 @@ Params19_again:
 
 Params19_again: // just to test summary tensorboard (justatest)
     -8x8
-    -factorize rewards with 8
+    -Exponentiate rewards with 8
     Running
     May18_22-36-39_sodalith.cip.ifi.lmu.de
 
@@ -615,18 +657,26 @@ Params32:
 Params33:
     Runing
 
+Params34:
+Params35:
+Params36:
+
+ParamsXX:
+    +Refactored reward_exponent, game and key
+
 """
 
 
-def simulate_many_minidiscrete():
+def simulate_many_minidiscrete(game, key):
     env = gym.make('MiniDiscreteEnv-v0')
     env.goal_pos = [3, -3]  # [2,-2]
     env.borders = [7, -7]  # [5,-5]
     env.max_steps = 100  # 50
     desired_len = 9
 
-    key = sys.argv[1]
     params = get_params(env)[key]
+    params["game"] = game
+    params["key"] = key
 
     start_time = time.time()
     episodes = [alphazero.run(env, params, desired_len, i) for i in range(10)]
@@ -641,11 +691,8 @@ class Action(Enum):
     forward = 2
 
 
-def simulate_many_minigrid():
-    start_time = time.time()
-    env = gym.make('MiniGrid-Empty-5x5-v0')
-    # env = gym.make('MiniGrid-Empty-8x8-v0')
-    desired_len = 8
+def prepare_minigrid(game, params, pomdp):
+    env = gym.make('MiniGrid-Empty-%s-v0' % game)
 
     # Monkey patch actions, step and reset.
     # TODO Seems a bit hacky.
@@ -661,8 +708,12 @@ def simulate_many_minigrid():
         obs, reward, done, _ = cls._step(action)
         # TODO An idea was to quadruple reward to make good rewards more
         # important.
-        # return obs['image'].flatten(), reward ** 8, done, None
-        return obs['image'].flatten(), reward, done, None
+        if pomdp:
+            # TODO This is partially observable. Either return history or
+            # addtionally the global state.
+            return obs['image'].flatten(), reward ** params["reward_exponent"], done, None
+        else:
+            return np.append(cls.agent_pos, cls.agent_dir), reward ** params["reward_exponent"], done, None
     env._step = env.step
     env.__class__._step = env.__class__.step
     env.step = step.__get__(env, env.__class__)
@@ -670,18 +721,33 @@ def simulate_many_minigrid():
 
     def reset(cls):
         obs = cls._reset()
-        return obs['image'].flatten()
+        if pomdp:
+            return obs['image'].flatten()
+        else:
+            return np.append(cls.agent_pos, cls.agent_dir)
     env._reset = env.reset
     env.__class__._reset = env.__class__.reset
     env.reset = reset.__get__(env, env.__class__)
     env.__class__.reset = reset.__get__(env, env.__class__)
 
+    return env
+
+
+def simulate_many_minigrid(game, key, pomdp=False):
+    start_time = time.time()
+    desired_len = 8
+
     # Load params and run AlphaZero.
-    key = sys.argv[1]
-    params = get_params(env)[key]
+    # TODO Passing None -> lmao, refactor this
+    params = get_params(None)[key]
+    params["game"] = game
     params["key"] = key
     params["n_actions"] = 3
-    params["n_input_features"] = 147
+    params["n_input_features"] = 3
+    if pomdp:
+        params["n_input_features"] = 147
+    env = prepare_minigrid(game, params, pomdp)
+    params["env"] = env
 
     writer = SummaryWriter()
     for i in range(10):
@@ -698,5 +764,19 @@ def simulate_many_minigrid():
 
 
 if __name__ == '__main__':
-    simulate_many_minigrid()
-    # simulate_many_minidiscrete()
+    games = {
+        'minidiscrete': (simulate_many_minidiscrete,),
+        '5x5': (simulate_many_minigrid,),
+        '8x8': (simulate_many_minigrid,),
+        '5x5_pomdp': (
+            functools.partial(simulate_many_minigrid, pomdp=True),
+            '5x5'
+        )
+    }
+    game = sys.argv[1]
+    key = sys.argv[2]
+    game_func = games[game]
+    if len(game_func) > 1:
+        game = game_func[1]
+    print('Playing game', game, 'using func', game_func, '.')
+    game_func[0](game, key)
