@@ -27,7 +27,9 @@ def get_params(env):
         "horizon": 200,
         "dirichlet_alpha": .3,
         "dirichlet_frac": .25,
-        "pb_c_base": 50,
+        "pb_c_base": 50,  # TODO I think this should be based on simulations.
+        # base was 19652. But with just 100 simulations (and thus visits only
+        # getting to 100 at max) visits don't matter.. At base=50, hell yes !
 
         # A2C
         "alpha": .01,  # .01 (AlphaZero best); .001 (Imitation best)
@@ -407,6 +409,18 @@ def get_params(env):
         "pb_c_base": 100
     })
 
+    paramsPROF = copy.deepcopy(params1)
+    paramsPROF.update({
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 1,
+        "train_steps": 1000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "episodes": 1,
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -444,6 +458,7 @@ def get_params(env):
         "34": params34,
         "35": params35,
         "36": params36,
+        "PROF": paramsPROF,
     }
 
 
@@ -609,7 +624,7 @@ Params27:
     Cancelled after 3 runs. Did not learn anything stable.
     May18_14-01-25_beryll.cip.ifi.lmu.de
 
-Params28:
+Params28: // btw this was POMDP version.
     EVAL 122022 0.8008746470559999
     Minutes: 65.5352343996366
     Rerun:
@@ -652,13 +667,11 @@ Params28_again:
     Running
 
 Params32:
-    Runing
+    +Refactored reward_exponent, game and key
+    Running
 
 Params33:
-    Runing
-
-ParamsXX:
-    +Refactored reward_exponent, game and key
+    Running
 
 Params34:
 Params35:
@@ -667,12 +680,16 @@ Params36:
 Params19_again:
     +5x5 but no pomdp
     +no reward exponentiation
-    Running
+    Minutes: 193.41552900870641
+    May19_07-38-31_sodalith.cip.ifi.lmu.de
+    Learnt 4/10, didn't learn 6/10
 
 Params28_again:
     +5x5 but no pomdp
     +no reward exponentiation
-    Running
+    Minutes: 182.95773999293644
+    May19_07-49-15_sodalith.cip.ifi.lmu.de
+    Learnt 7/10, didn't learn 3/10
 
 
 """
@@ -744,7 +761,7 @@ def prepare_minigrid(game, params, pomdp):
     return env
 
 
-def simulate_many_minigrid(game, key, pomdp=False):
+def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
     start_time = time.time()
     desired_len = 8
 
@@ -761,7 +778,7 @@ def simulate_many_minigrid(game, key, pomdp=False):
     params["env"] = env
 
     writer = SummaryWriter()
-    for i in range(10):
+    for i in range(n_runs):
         # TODO Also return last reward and add it to summary.
         episodes, last_eval_len = alphazero.run(
             env, params, desired_len, i, writer

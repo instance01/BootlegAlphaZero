@@ -12,7 +12,6 @@ import a2c
 from mcts import MCTS
 
 
-
 class ReplayBuffer:
     def __init__(self, window_size, prioritized_sampling=True):
         self.buffer = []
@@ -155,11 +154,10 @@ def episode(
     sample_lens = []
     losses = 0
     for i in range(train_steps):
-        samples = replay_buffer.sample()
-        for sample in samples:
-            loss = a2c_agent.update(*sample)
+        game = replay_buffer.sample()
+        loss = a2c_agent.update(game)
 
-        actions = ''.join([str(np.argmax(sample[-1])) for sample in samples])
+        actions = ''.join([str(np.argmax(sample[-1])) for sample in game])
         samples_used[actions] += 1
         if i % 10 == 0:
             sys.stdout.write(".")

@@ -70,50 +70,37 @@ class A2CLearner:
         normalized_returns /= (discounted_returns.std() + self.eps)
         return normalized_returns
 
-    def update(self, state, action, reward, next_state, done, mcts_action):
+    def update(self, game):
         """Performs a learning update of the currently learned policy and
         value function.
         """
-        self.transitions.append(
-            (state, action, reward, next_state, done, mcts_action)
+        states, actions, rewards, _, _, mcts_actions = zip(*game)
+
+        # Calculate and normalize discounted returns.
+        normalized_returns = self._calc_normalized_rewards(rewards)
+
+        # Calculate losses of policy and value function.
+        # Minimize cross entropy loss between softmax of net and mcts action
+        # (one-hot encoded).
+        actions = torch.tensor(actions, device=self.device, dtype=torch.long)
+        action_probs, state_values = self.predict_policy(states)
+
+        action_probs = action_probs.detach().numpy()
+        mcts_actions = np.asarray(mcts_actions)
+
+        cross_entropy = (
+            -(np.log(action_probs) * mcts_actions).sum(axis=1)
+        ).sum(axis=0)
+        value_losses = F.smooth_l1_loss(
+            state_values.reshape(-1),
+            normalized_returns,
+            reduction='sum'
         )
-        loss = None
-        if done:
-            states, actions, rewards, next_states, _, mcts_actions = tuple(
-                zip(*self.transitions)
-            )
+        loss = cross_entropy + value_losses
 
-            # Calculate and normalize discounted returns.
-            normalized_returns = self._calc_normalized_rewards(rewards)
+        # Optimize joint loss.
+        self.policy_optimizer.zero_grad()
+        loss.backward()
+        self.policy_optimizer.step()
 
-            # Calculate losses of policy and value function.
-            # Minimize cross entropy loss between softmax of net and mcts action
-            # (one-hot encoded)
-            # -y * log(^y)
-            actions = torch.tensor(actions, device=self.device, dtype=torch.long)
-            action_probs, state_values = self.predict_policy(states)
-            policy_losses = []
-            value_losses = []
-            zipped = zip(
-                action_probs,
-                actions,
-                state_values,
-                normalized_returns,
-                mcts_actions
-            )
-            for probs, action, value, R, mcts_action in zipped:
-                cross_entropy = -sum([
-                    torch.log(p) * a for p, a in zip(probs, mcts_action)
-                ])
-                policy_losses.append(cross_entropy)
-                value_losses.append(F.smooth_l1_loss(value, torch.tensor([R])))
-            loss = torch.stack(policy_losses).sum() + torch.stack(value_losses).sum()
-
-            # Optimize joint loss.
-            self.policy_optimizer.zero_grad()
-            loss.backward()
-            self.policy_optimizer.step()
-
-            # Delete all experiences afterwards.
-            self.transitions.clear()
         return loss
