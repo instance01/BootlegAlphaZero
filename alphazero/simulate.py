@@ -421,6 +421,50 @@ def get_params(env):
         "episodes": 1,
     })
 
+    params37 = copy.deepcopy(params1)
+    params37.update({
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 10,
+        "train_steps": 3000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params38 = copy.deepcopy(params1)
+    params38.update({
+        "alpha": .005,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 3000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params39 = copy.deepcopy(params1)
+    params39.update({
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 4000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
+    params40 = copy.deepcopy(params1)
+    params40.update({
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 5000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -459,6 +503,10 @@ def get_params(env):
         "35": params35,
         "36": params36,
         "PROF": paramsPROF,
+        "37": params37,
+        "38": params38,
+        "39": params39,
+        "40": params40,
     }
 
 
@@ -674,8 +722,13 @@ Params33:
     Running
 
 Params34:
+    Running (amazonit)
+
 Params35:
+    Running (amazonit)
+
 Params36:
+    Running (amazonit)
 
 Params19_again:
     +5x5 but no pomdp
@@ -691,6 +744,21 @@ Params28_again:
     May19_07-49-15_sodalith.cip.ifi.lmu.de
     Learnt 7/10, didn't learn 3/10
 
+Params28_again:
+    +made learning much faster
+    Running (sodalith)
+
+Params37:
+    Running (beryll)
+
+Params38:
+    Running (beryll)
+
+Params39:
+    Running (sodalith)
+
+Params40:
+    Running (sodalith)
 
 """
 
