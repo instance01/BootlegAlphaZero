@@ -657,12 +657,23 @@ Params32:
 Params33:
     Runing
 
+ParamsXX:
+    +Refactored reward_exponent, game and key
+
 Params34:
 Params35:
 Params36:
 
-ParamsXX:
-    +Refactored reward_exponent, game and key
+Params19_again:
+    +5x5 but no pomdp
+    +no reward exponentiation
+    Running
+
+Params28_again:
+    +5x5 but no pomdp
+    +no reward exponentiation
+    Running
+
 
 """
 
