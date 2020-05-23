@@ -27,8 +27,9 @@ class Node:
             len(self.children),
             self.reward,
             str(self.action),
-            self.env.pos,
-            self.env.was_right
+            self.env.agent_pos[0],
+            self.env.agent_pos[1]
+            # self.env.was_right
         )
 
     def __eq__(self, other):
@@ -58,9 +59,11 @@ class MCTS:
         self.dirichlet_alpha = params["dirichlet_alpha"]
         self.dirichlet_frac = params["dirichlet_frac"]
         self.pb_c_base = params["pb_c_base"]
+        self.pb_c_init = params["pb_c_init"]
         self.a2c_agent = a2c_agent
 
         self.total_depth = 0
+        self.policy_net_cache = {}
 
     def _ucb(self, parent_node, child_node, action_probs):
         # Polynomial UCT just like in the original AlphaZero.
@@ -68,7 +71,7 @@ class MCTS:
         action = child_node.action
 
         base = self.pb_c_base
-        pb_c = np.log((parent_node.visits + base + 1) / base) + 1.25
+        pb_c = np.log((parent_node.visits + base + 1) / base) + self.pb_c_init
         pb_c *= np.sqrt(parent_node.visits) / (child_node.visits + 1)
 
         prior_score = pb_c * action_probs[action]
@@ -199,13 +202,4 @@ class MCTS:
             self.backup(node, q_val, path_len + self.total_depth)
         self.total_depth += 1
 
-        curr_node = self.root_node.children[
-            np.argmax([n.Q for n in self.root_node])
-            # TODO Q or visits ?! AlphaZero uses visits..
-        ]
-
-        curr_node.parent = None
-        self.root_node = curr_node
-        if ret_node:
-            return curr_node
-        return curr_node.action
+        return [n.visits / self.n_iter for n in self.root_node]
