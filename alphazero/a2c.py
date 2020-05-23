@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -37,6 +39,7 @@ class A2CLearner:
         self.policy_net = A2CNet(
             self.n_input_features, self.n_actions
         ).to(self.device)
+        self.policy_net_copy = copy.deepcopy(self.policy_net)
         self.policy_optimizer = torch.optim.Adam(
             self.policy_net.parameters(),
             lr=params["alpha"]
@@ -54,7 +57,12 @@ class A2CLearner:
         """Predicts the action probabilities.
         """
         states = torch.tensor(states, device=self.device, dtype=torch.float)
+        # TODO Unused for now.
+        # return self.policy_net_copy(states)
         return self.policy_net(states)
+
+    def set_nn_to_next_gen(self):
+        self.policy_net_copy = copy.deepcopy(self.policy_net)
 
     def _calc_normalized_rewards(self, rewards):
         discounted_returns = []
@@ -71,10 +79,10 @@ class A2CLearner:
         return normalized_returns
 
     def update(self, game):
-        """Performs a learning update of the currently learned policy and
+        """Performs a learning update of the currently learnt policy and
         value function.
         """
-        states, actions, rewards, _, _, mcts_actions = zip(*game)
+        states, _, rewards, _, _, mcts_actions = zip(*game)
 
         # Calculate and normalize discounted returns.
         normalized_returns = self._calc_normalized_rewards(rewards)
@@ -82,14 +90,14 @@ class A2CLearner:
         # Calculate losses of policy and value function.
         # Minimize cross entropy loss between softmax of net and mcts action
         # (one-hot encoded).
-        actions = torch.tensor(actions, device=self.device, dtype=torch.long)
         action_probs, state_values = self.predict_policy(states)
 
-        action_probs = action_probs.detach().numpy()
-        mcts_actions = np.asarray(mcts_actions)
+        mcts_actions = torch.tensor(
+            mcts_actions, device=self.device, dtype=torch.float
+        )
 
         cross_entropy = (
-            -(np.log(action_probs) * mcts_actions).sum(axis=1)
+            -(torch.log(action_probs) * mcts_actions).sum(axis=1)
         ).sum(axis=0)
         value_losses = F.smooth_l1_loss(
             state_values.reshape(-1),
