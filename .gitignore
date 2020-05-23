@@ -1,0 +1,6 @@
+bak/
+*bak
+*.swp
+*.dbg
+steps.txt
+__pycache__
