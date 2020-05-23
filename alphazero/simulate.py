@@ -659,6 +659,22 @@ def get_params(env):
         "pb_c_init": .334
     })
 
+    params47 = copy.deepcopy(params41)
+    params47.update({
+        "pb_c_init": .4
+    })
+
+    params48 = copy.deepcopy(params41)
+    params48.update({
+        "dirichlet_alpha": .4,
+        "dirichlet_frac": .5
+    })
+
+    params49 = copy.deepcopy(params41)
+    params49.update({
+        "alpha": .0005,
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -708,6 +724,9 @@ def get_params(env):
         "44": params44,
         "45": params45,
         "46": params46,
+        "47": params47,
+        "48": params48,
+        "49": params49,
     }
 
 
@@ -990,16 +1009,35 @@ Params44:
     Running (amazonit)
 
 Params45:
-    Running (beryll)
+    May23_11-58-18_beryll.cip.ifi.lmu.de
+    Minutes: 472.1143970608711
+    Learnt 10/10. Slow, but a bit better than Params43.
 
 Params41_again: (5x5)
     May23_11-58-21_indigiolith.cip.ifi.lmu.de
     Minutes: 69.30242917537689
+    Learnt 10/10.
     Good: Params generalize.
     BUT: Suboptimal solutions.
 
 Params46:
+    May23_14-20-16_indigiolith.cip.ifi.lmu.de
+    Minutes: 253.66197155714036
+    Learnt 10/10.
+
+Params47:
+    Running (beryll)
+
+Params48:
+    Running (sodalith)
+
+Params49:
     Running (indigiolith)
+
+
+CURRENT BEST:
+Params41 prio=True
+Params45 prio=False
 
 """
 
