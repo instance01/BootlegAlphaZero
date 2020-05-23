@@ -13,6 +13,9 @@ import gym_minigrid  # noqa: F401
 import alphazero
 from torch.utils.tensorboard import SummaryWriter
 
+import pdb
+pdb.set_trace()
+
 
 def get_params(env):
     params1 = {
@@ -30,6 +33,7 @@ def get_params(env):
         "pb_c_base": 50,  # TODO I think this should be based on simulations.
         # base was 19652. But with just 100 simulations (and thus visits only
         # getting to 100 at max) visits don't matter.. At base=50, hell yes !
+        "pb_c_init": 1.25,
 
         # A2C
         "alpha": .01,  # .01 (AlphaZero best); .001 (Imitation best)
@@ -465,6 +469,214 @@ def get_params(env):
         "dirichlet_frac": .5
     })
 
+    # With paramsCURR I had a quickly iterating approach.
+    # This was just temporary, I changed something quickly and checked whether
+    # it works after watching output for one run.
+
+    # value function sometimes is fine.. policy not learnt.
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .01,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 4000,
+        "dirichlet_alpha": .3,
+        # "dirichlet_frac": .5
+        "dirichlet_frac": .25  # both worked btw. and .25 was a bit better.
+    })
+
+    # Works well, with value
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .01,
+        "simulations": 50,
+        "prioritized_sampling": False,
+        "n_actors": 10,
+        "train_steps": 4000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .25
+    })
+
+    # ... fucking shit
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .001,
+        "simulations": 200,  # 50
+        "prioritized_sampling": False,
+        "n_actors": 10,
+        "train_steps": 4000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .25,
+        "pb_c_base": 10
+    })
+
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .001,
+        "simulations": 400,  # 50
+        "prioritized_sampling": False,
+        "n_actors": 40,  # 10
+        "train_steps": 4000,
+        "dirichlet_alpha": .2,
+        "dirichlet_frac": .15,
+        "pb_c_base": 10
+    })
+
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .001,
+        "simulations": 200,  # 50
+        "prioritized_sampling": True,
+        "n_actors": 40,  # 10
+        "train_steps": 4000,
+        "dirichlet_alpha": .2,
+        "dirichlet_frac": .15,
+        "pb_c_base": 10,
+        "reward_exponent": 8,
+        "memory_capacity": 80
+    })
+
+    # Sanity check: // works
+    paramsCURR = copy.deepcopy(params19)
+    paramsCURR.update({
+        "reward_exponent": 8
+    })
+
+    # WORKS AMAZING! But: Need a bit more randomness.. Now it gets suboptimal
+    # solutions too.
+    # The thing that worked: pb_c_init. So now we learn policy too.
+    # sodalith
+    # May21_12-54-01_sodalith.cip.ifi.lmu.de
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .001,
+        "simulations": 100,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 10000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 19000,
+        "pb_c_init": .25,
+        "horizon": 256,  # For 8x8
+    })
+
+    # beryll (PRETTY GOOD)
+    # May21_15-44-50_beryll.cip.ifi.lmu.de
+    # EVAL 00022222022222 0.95078125
+    # Minutes: 1012.9252081076304
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .001,
+        "simulations": 100,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 10000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 19000,
+        "pb_c_init": .3,  # .25
+        "horizon": 256,  # For 8x8
+    })
+
+    # amazonit, danburit
+    # May21_22-25-31_danburit.cip.ifi.lmu.de
+    # May21_22-45-40_amazonit.cip.ifi.lmu.de
+    # Pretty bad.
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .001,
+        "simulations": 100,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 10000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 10,
+        "pb_c_init": .1,
+        "horizon": 256,  # For 8x8
+    })
+
+    # original; danburit
+    # May22_06-59-34_danburit.cip.ifi.lmu.de
+    paramsCURR = copy.deepcopy(params1)
+    paramsCURR.update({
+        "alpha": .001,
+        "simulations": 100,
+        "prioritized_sampling": True,
+        "n_actors": 10,
+        "train_steps": 10000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 19000,
+        "pb_c_init": .25,
+        "horizon": 256,  # For 8x8
+    })
+
+    # sodalith (BEST), but slow.
+    # May22_07-45-00_sodalith.cip.ifi.lmu.de
+    # Minutes: 268.5126764456431
+    params41 = copy.deepcopy(params1)
+    params41.update({
+        "alpha": .001,
+        "simulations": 100,
+        "prioritized_sampling": True,
+        "n_actors": 20,
+        "train_steps": 5000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 19000,
+        "pb_c_init": .3,
+        "horizon": 256,  # For 8x8
+        "episodes": 200,
+    })
+
+    params42 = copy.deepcopy(params1)
+    params42.update({
+        "alpha": .001,
+        "simulations": 100,
+        "prioritized_sampling": True,
+        "n_actors": 20,
+        "train_steps": 5000,
+        "dirichlet_alpha": .2,
+        "dirichlet_frac": .25,
+        "pb_c_base": 19000,
+        "pb_c_init": .3,
+        "horizon": 256,  # For 8x8
+        "episodes": 200,
+    })
+
+    params43 = copy.deepcopy(params1)
+    params43.update({
+        "alpha": .001,
+        "simulations": 100,
+        "prioritized_sampling": False,
+        "n_actors": 20,
+        "train_steps": 5000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 19000,
+        "pb_c_init": .3,
+        "horizon": 256,  # For 8x8
+        "episodes": 200,
+    })
+
+    params44 = copy.deepcopy(params1)
+    params44.update({
+        "alpha": .005,
+        "simulations": 100,
+        "prioritized_sampling": True,
+        "n_actors": 20,
+        "train_steps": 5000,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 19000,
+        "pb_c_init": .3,
+        "horizon": 256,  # For 8x8
+        "episodes": 200,
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -507,6 +719,11 @@ def get_params(env):
         "38": params38,
         "39": params39,
         "40": params40,
+        "CURR": paramsCURR,
+        "41": params41,
+        "42": params42,
+        "43": params43,
+        "44": params44,
     }
 
 
@@ -722,13 +939,16 @@ Params33:
     Running
 
 Params34:
-    Running (amazonit)
+    May19_17-28-02_amazonit.cip.ifi.lmu.de
+    Did not learn anything
 
 Params35:
-    Running (amazonit)
+    May19_17-28-13_amazonit.cip.ifi.lmu.de
+    Did not learn anything
 
 Params36:
-    Running (amazonit)
+    May19_17-28-35_amazonit.cip.ifi.lmu.de
+    Did not learn anything
 
 Params19_again:
     +5x5 but no pomdp
@@ -745,29 +965,50 @@ Params28_again:
     Learnt 7/10, didn't learn 3/10
 
 Params28_again:
-    +made learning much faster
-    Running (sodalith)
+    May19_17-21-56_sodalith.cip.ifi.lmu.de
+    Did not learn anything
 
 Params37:
-    Running (beryll)
+    May19_17-29-27_beryll.cip.ifi.lmu.de
+    Did not learn anything
 
 Params38:
-    Running (beryll)
+    May19_17-29-37_beryll.cip.ifi.lmu.de
+    Learnt 1/10, didn't learn 9/10.
 
 Params39:
-    Running (sodalith)
+    May19_17-30-52_sodalith.cip.ifi.lmu.de
+    Did not learn anything
 
 Params40:
-    Running (sodalith)
+    May19_17-31-00_sodalith.cip.ifi.lmu.de
+    Learnt 2/10. Did not learn 8/10.
+
+Params41:
+    May22_22-57-11_sodalith.cip.ifi.lmu.de
+    Minutes: 207.7851839462916
+    Learnt 10/10. Rather quick.
+
+Params42:
+    Running (danburit)
+
+Params43:
+    May22_22-59-15_beryll.cip.ifi.lmu.de
+    Minutes: 575.4137872378031
+    Learnt 10/10. Slow.
+    But this is without prioritized sampling!!
+
+Params44:
+    Running (amazonit)
 
 """
 
 
 def simulate_many_minidiscrete(game, key):
     env = gym.make('MiniDiscreteEnv-v0')
-    env.goal_pos = [3, -3]  # [2,-2]
-    env.borders = [7, -7]  # [5,-5]
-    env.max_steps = 100  # 50
+    env.goal_pos = [3, -3]
+    env.borders = [7, -7]
+    env.max_steps = 100
     desired_len = 9
 
     params = get_params(env)[key]
@@ -831,7 +1072,7 @@ def prepare_minigrid(game, params, pomdp):
 
 def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
     start_time = time.time()
-    desired_len = 8
+    desired_len = 18  # 8
 
     # Load params and run AlphaZero.
     # TODO Passing None -> lmao, refactor this
