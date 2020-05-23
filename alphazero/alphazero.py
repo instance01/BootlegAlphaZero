@@ -31,7 +31,7 @@ class ReplayBuffer:
         # Sum up rewards.
         # See add() for more information on the format of the samples.
         p = np.array([
-            sum(sample[2] for sample in samples)
+            sum(sample[1] for sample in samples)
             for samples in self.buffer
         ])
         return p

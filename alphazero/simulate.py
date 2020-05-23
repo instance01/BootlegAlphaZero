@@ -632,49 +632,31 @@ def get_params(env):
         "episodes": 200,
     })
 
-    params42 = copy.deepcopy(params1)
+    params42 = copy.deepcopy(params41)
     params42.update({
-        "alpha": .001,
-        "simulations": 100,
-        "prioritized_sampling": True,
-        "n_actors": 20,
-        "train_steps": 5000,
         "dirichlet_alpha": .2,
-        "dirichlet_frac": .25,
-        "pb_c_base": 19000,
-        "pb_c_init": .3,
-        "horizon": 256,  # For 8x8
-        "episodes": 200,
+        "dirichlet_frac": .25
     })
 
-    params43 = copy.deepcopy(params1)
+    params43 = copy.deepcopy(params41)
     params43.update({
-        "alpha": .001,
-        "simulations": 100,
-        "prioritized_sampling": False,
-        "n_actors": 20,
-        "train_steps": 5000,
-        "dirichlet_alpha": .3,
-        "dirichlet_frac": .5,
-        "pb_c_base": 19000,
-        "pb_c_init": .3,
-        "horizon": 256,  # For 8x8
-        "episodes": 200,
+        "prioritized_sampling": False
     })
 
-    params44 = copy.deepcopy(params1)
+    params44 = copy.deepcopy(params41)
     params44.update({
-        "alpha": .005,
-        "simulations": 100,
-        "prioritized_sampling": True,
-        "n_actors": 20,
-        "train_steps": 5000,
-        "dirichlet_alpha": .3,
-        "dirichlet_frac": .5,
-        "pb_c_base": 19000,
-        "pb_c_init": .3,
-        "horizon": 256,  # For 8x8
-        "episodes": 200,
+        "alpha": .005
+    })
+
+    params45 = copy.deepcopy(params41)
+    params45.update({
+        "prioritized_sampling": False,
+        "n_actors": 40
+    })
+
+    params46 = copy.deepcopy(params41)
+    params46.update({
+        "pb_c_init": .334
     })
 
     return {
@@ -724,6 +706,8 @@ def get_params(env):
         "42": params42,
         "43": params43,
         "44": params44,
+        "45": params45,
+        "46": params46,
     }
 
 
@@ -988,6 +972,10 @@ Params41:
     May22_22-57-11_sodalith.cip.ifi.lmu.de
     Minutes: 207.7851839462916
     Learnt 10/10. Rather quick.
+    Another run:
+    May23_09-52-35_sodalith.cip.ifi.lmu.de
+    Minutes: 240.90073643128076
+    BUT: Suboptimal solutions.
 
 Params42:
     Running (danburit)
@@ -1000,6 +988,18 @@ Params43:
 
 Params44:
     Running (amazonit)
+
+Params45:
+    Running (beryll)
+
+Params41_again: (5x5)
+    May23_11-58-21_indigiolith.cip.ifi.lmu.de
+    Minutes: 69.30242917537689
+    Good: Params generalize.
+    BUT: Suboptimal solutions.
+
+Params46:
+    Running (indigiolith)
 
 """
 
