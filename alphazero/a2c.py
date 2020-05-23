@@ -82,7 +82,7 @@ class A2CLearner:
         """Performs a learning update of the currently learnt policy and
         value function.
         """
-        states, _, rewards, _, _, mcts_actions = zip(*game)
+        states, rewards, mcts_actions = zip(*game)
 
         # Calculate and normalize discounted returns.
         normalized_returns = self._calc_normalized_rewards(rewards)

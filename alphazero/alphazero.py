@@ -51,37 +51,62 @@ class ReplayBuffer:
         return self.buffer[np.random.choice(len(self.buffer), p=p)]
 
 
-def evaluate(env, a2c_agent):
-    env = copy.deepcopy(env)
+def evaluate_with_policy(env, params, a2c_agent, policy):
     state = env.reset()
 
     done = False
     total_reward = 0
     actions = ""
+    i = 0
     while not done:
-        action_probs, _ = a2c_agent.predict_policy([state])
-        action = np.argmax(action_probs.tolist()[0])
+        action_probs, val = a2c_agent.predict_policy([state])
+
+        vals = []
+        for action in range(params['n_actions']):
+            env_ = copy.deepcopy(env)
+            state_, _, _, _ = env_.step(action)
+            _, val = a2c_agent.predict_policy([state_])
+            vals.append(val.detach())
+
+        i += 1
+        action = policy(i, state, action_probs, vals)
 
         state, reward, done, _ = env.step(action)
         total_reward += reward
         actions += str(action)
+
+    return actions, total_reward
+
+
+def evaluate(env, params, a2c_agent):
+    env = copy.deepcopy(env)
+
+    def action_policy(i, state, action_probs, vals):
+        # Policy that takes the argmax of the action probabilities.
+        if i < 10:
+            print(state, action_probs.detach().tolist(), vals)
+        return np.argmax(action_probs.tolist()[0])
+
+    def val_policy(i, state, action_probs, vals):
+        # Policy that takes the argmax of the value.
+        if i < 10:
+            print(state, vals)
+        return np.argmax(vals)
+
+    actions, total_reward = evaluate_with_policy(
+        env, params, a2c_agent, action_policy
+    )
+    evaluate_with_policy(env, params, a2c_agent, val_policy)
     print("EVAL", actions, total_reward)
     return len(actions), total_reward
-
-
-def one_hot_encode(action, actions_len):
-    action_one_hot = [0. for _ in range(actions_len)]
-    action_one_hot[action] = 1.
-    return action_one_hot
 
 
 def run_actor(env, params, mcts_agent, a2c_agent):
     # Since we're running in parallel.
     np.random.seed(int.from_bytes(os.urandom(4), byteorder='little'))
-    # TODO: Is that even needed?
     env = copy.deepcopy(env)
     mcts_agent = copy.deepcopy(mcts_agent)
-    a2c_agent = copy.deepcopy(a2c_agent)
+    mcts_agent.reset_policy_cache()
 
     # TODO REMOVE
     mcts_actions = ""
@@ -91,20 +116,20 @@ def run_actor(env, params, mcts_agent, a2c_agent):
     game = []
     while not done:
         mcts_action = mcts_agent.policy(env, state)
-        # TODO This samples. Recheck whether we should sample here or
-        # exploit, ie argmax.
-        action = a2c_agent.policy(state)
+        sampled_action = np.random.choice(
+            list(range(params["n_actions"])),
+            p=mcts_action
+        )
+        mcts_actions += str(sampled_action)
 
-        # TODO Apparently AlphaZero simply goes by MCTS in self play..
-        # hmm..
-        #next_state, reward, done, _ = env.step(action)
-        next_state, reward, done, _ = env.step(mcts_action)
+        action_probs, _ = a2c_agent.predict_policy([state])
 
-        mcts_actions += str(mcts_action)
+        # TODO REMOVE
+        if state[0] <= 2 and state[1] <= 2 and state[2] == 0:
+            print(state, action_probs.tolist()[0], mcts_action, np.max(mcts_action))
 
-        mcts_action = one_hot_encode(mcts_action, params["n_actions"])
-        sample = (state, action, reward, next_state, done, mcts_action)
-
+        next_state, reward, done, _ = env.step(sampled_action)
+        sample = (state, reward, mcts_action)
         state = next_state
         game.append(sample)
 
@@ -149,10 +174,14 @@ def episode(
     print('')
     print(replay_buffer.get_rewards()[-n_actors:])
 
+    a = [np.max(s[-1]) for s in game for game in replay_buffer.buffer[-n_actors:]]
+    print("CONFIDENCE", np.mean(a), np.median(a))
+
     # Train network after self play.
     samples_used = defaultdict(int)  # TODO REMOVE
     sample_lens = []
     losses = 0
+
     for i in range(train_steps):
         game = replay_buffer.sample()
         loss = a2c_agent.update(game)
@@ -175,7 +204,7 @@ def episode(
         losses / train_steps,
         " |TIME", time.time() - start_time
     )
-    eval_length, total_reward = evaluate(env, a2c_agent)
+    eval_length, total_reward = evaluate(env, params, a2c_agent)
     writer.add_scalar('Eval/Length/%d' % n_run, eval_length, n_episode)
     writer.add_scalar('Eval/Reward/%d' % n_run, total_reward, n_episode)
     writer.add_histogram('Actor/Sample_length/%d' % n_run, np.array(actor_lengths), n_episode)
@@ -189,7 +218,10 @@ def run(env, params, desired_eval_len, n_run, writer=None):
     writer.add_text('Info/params/%d' % n_run, str(params), 0)
 
     start_time = time.time()
-    replay_buffer = ReplayBuffer(params["memory_capacity"], params["prioritized_sampling"])
+    replay_buffer = ReplayBuffer(
+        params["memory_capacity"],
+        params["prioritized_sampling"]
+    )
     a2c_agent = a2c.A2CLearner(params)
     mcts_agent = MCTS(
         params["env"],
@@ -217,6 +249,6 @@ def run(env, params, desired_eval_len, n_run, writer=None):
             is_done_stably += 1
         else:
             is_done_stably = 0
-        if is_done_stably > 5:
+        if is_done_stably > 10:
             break
     return i, eval_len
