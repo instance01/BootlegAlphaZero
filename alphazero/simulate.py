@@ -685,6 +685,27 @@ def get_params(env):
         "pb_c_init": .25
     })
 
+    params52 = copy.deepcopy(params41)
+    params52.update({
+        "pb_c_base": 500
+    })
+
+    params53 = copy.deepcopy(params41)
+    params53.update({
+        "pb_c_base": 1
+    })
+
+    params54 = copy.deepcopy(params41)
+    params54.update({
+        "pb_c_base": 5000
+    })
+
+    params55 = copy.deepcopy(params41)
+    params55.update({
+        "simulations": 150,
+        "horizon": 1024,  # For 16x16
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -739,6 +760,10 @@ def get_params(env):
         "49": params49,
         "50": params50,
         "51": params51,
+        "52": params52,
+        "53": params53,
+        "54": params54,
+        "55": params55,
     }
 
 
@@ -1056,6 +1081,27 @@ Params49:
     Minutes: ~278
     Learnt 10/10.
 
+Params50:
+    May24_09-33-49_sodalith.cip.ifi.lmu.de
+    Cancelled. Too slow and did not learn good enough.
+    Learnt 1/5. (but 12, good solution..)
+
+Params51:
+    May24_09-34-06_indigiolith.cip.ifi.lmu.de
+    Minutes: 507.6325584053993
+    Learnt 10/10. Slow.
+
+Params52:
+    Running (indigiolith)
+
+Params53:
+    Running (sodalith)
+
+Params54:
+    Running (danburit)
+
+Params55: (16x16)
+    Running (amazonit)
 
 CURRENT BEST:
 Params41 prio=True
@@ -1165,6 +1211,7 @@ if __name__ == '__main__':
         'minidiscrete': (simulate_many_minidiscrete,),
         '5x5': (simulate_many_minigrid,),
         '8x8': (simulate_many_minigrid,),
+        '16x16': (simulate_many_minigrid,),
         '5x5_pomdp': (
             functools.partial(simulate_many_minigrid, pomdp=True),
             '5x5'
