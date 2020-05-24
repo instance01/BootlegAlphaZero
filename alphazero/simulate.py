@@ -675,6 +675,16 @@ def get_params(env):
         "alpha": .0005,
     })
 
+    params50 = copy.deepcopy(params41)
+    params50.update({
+        "pb_c_base": 50
+    })
+
+    params51 = copy.deepcopy(params41)
+    params51.update({
+        "pb_c_init": .25
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -727,6 +737,8 @@ def get_params(env):
         "47": params47,
         "48": params48,
         "49": params49,
+        "50": params50,
+        "51": params51,
     }
 
 
@@ -997,7 +1009,9 @@ Params41:
     BUT: Suboptimal solutions.
 
 Params42:
-    Running (danburit)
+    May22_22-58-34_danburit.cip.ifi.lmu.de
+    Minutes: ~Roughly a day
+    Learnt 9/9. VERY slow.
 
 Params43:
     May22_22-59-15_beryll.cip.ifi.lmu.de
@@ -1006,7 +1020,9 @@ Params43:
     But this is without prioritized sampling!!
 
 Params44:
-    Running (amazonit)
+    May22_22-59-54_amazonit.cip.ifi.lmu.de
+    Minutes: ~Roughly 19 hours.
+    Learnt 5/7. Did not learn 2/7. Very slow.
 
 Params45:
     May23_11-58-18_beryll.cip.ifi.lmu.de
@@ -1026,13 +1042,19 @@ Params46:
     Learnt 10/10.
 
 Params47:
-    Running (beryll)
+    May23_19-55-29_beryll.cip.ifi.lmu.de
+    Minutes: ~600
+    Learnt 9/9.
 
 Params48:
-    Running (sodalith)
+    May23_19-55-49_sodalith.cip.ifi.lmu.de
+    Minutes: ~342
+    Learnt 10/10.
 
 Params49:
-    Running (indigiolith)
+    May23_19-55-59_indigiolith.cip.ifi.lmu.de
+    Minutes: ~278
+    Learnt 10/10.
 
 
 CURRENT BEST:
