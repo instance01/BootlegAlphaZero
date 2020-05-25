@@ -124,9 +124,9 @@ def run_actor(env, params, mcts_agent, a2c_agent):
 
         action_probs, _ = a2c_agent.predict_policy([state])
 
-        # TODO REMOVE
-        if state[0] <= 2 and state[1] <= 2 and state[2] == 0:
-            print(state, action_probs.tolist()[0], mcts_action, np.max(mcts_action))
+        # # TODO REMOVE
+        # if state[0] <= 2 and state[1] <= 2 and state[2] == 0:
+        #     print(state, action_probs.tolist()[0], mcts_action, np.max(mcts_action))
 
         next_state, reward, done, _ = env.step(sampled_action)
         sample = (state, reward, mcts_action)
@@ -159,7 +159,7 @@ def episode(
     actor_lengths = []
 
     # Run self play games in 4 parallel processes.
-    pool = multiprocessing.Pool(processes=4)
+    pool = multiprocessing.Pool(processes=params["n_procs"])
     multiple_results = [
         pool.apply_async(run_actor, (env, params, mcts_agent, a2c_agent))
         for _ in range(n_actors)

@@ -8,7 +8,7 @@ from enum import Enum
 import gym
 import numpy as np
 
-import mini_discrete_env  # noqa: F401
+import mini_envs.discrete_envs.mini_discrete_env  # noqa: F401
 import gym_minigrid  # noqa: F401
 import alphazero
 from torch.utils.tensorboard import SummaryWriter
@@ -42,6 +42,7 @@ def get_params(env):
         "memory_capacity": 1000,
         "prioritized_sampling": True,
         "episodes": 100,
+        "n_procs": 4,
         "n_actors": 20,  # 5000
         "train_steps": 2000,  # 700000
 
@@ -706,6 +707,44 @@ def get_params(env):
         "horizon": 1024,  # For 16x16
     })
 
+    params56 = copy.deepcopy(params41)
+    params56.update({
+        "simulations": 150,
+        "horizon": 1024,  # For 16x16
+        "reward_exponent": 8
+    })
+
+    params57 = copy.deepcopy(params41)
+    params57.update({
+        # For 16x16
+        "simulations": 150,
+        "horizon": 400,  # We won't need longer paths anyways.
+        "reward_exponent": 8,
+        "n_actors": 40,
+        "train_steps": 6000,
+        "n_procs": 8
+    })
+
+    params58 = copy.deepcopy(params41)
+    params58.update({
+        # For 16x16
+        "simulations": 150,
+        "horizon": 400,
+        "reward_exponent": 8,
+        "n_actors": 60,
+        "train_steps": 8000,
+        "n_procs": 8
+    })
+
+    params59 = copy.deepcopy(params41)
+    params59.update({
+        "episodes": 300,
+        "simulations": 150,
+        "horizon": 1024,
+        "n_actors": 30,
+        "n_procs": 8
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -764,6 +803,10 @@ def get_params(env):
         "53": params53,
         "54": params54,
         "55": params55,
+        "56": params56,
+        "57": params57,
+        "58": params58,
+        "59": params59,
     }
 
 
@@ -1092,16 +1135,46 @@ Params51:
     Learnt 10/10. Slow.
 
 Params52:
-    Running (indigiolith)
+    For 5x5:
+    May24_23-58-59_indigiolith.cip.ifi.lmu.de
+    Minutes: 100.3497024377187
+    Learnt 10/10. But a bit suboptimal paths.
+    For 8x8:
+    May25_09-06-02_indigiolith.cip.ifi.lmu.de
+    Minutes: 360.7428737640381
+    Learnt 10/10.
 
 Params53:
-    Running (sodalith)
+    For 5x5:
+    May25_00-00-59_sodalith.cip.ifi.lmu.de
+    Cancelled. Too slow and did not learn good enough.
+    Learnt 1/4.
 
 Params54:
-    Running (danburit)
+    For 5x5:
+    May25_00-00-53_danburit.cip.ifi.lmu.de
+    Minutes: 108.62775423924128
+    Learnt 10/10. But a bit suboptimal paths.
+    For 8x8:
+    May25_09-45-27_danburit.cip.ifi.lmu.de
+    Minutes: 722.0350600719452
+    Learnt 10/10. Very Slow.
 
 Params55: (16x16)
     Running (amazonit)
+
+Params56: (16x16)
+    Running (sodalith)
+
+Params57: (16x16)
+    Running (beryll)
+
+Params58: (16x16)
+    Running (danburit)
+
+Params59: (16x16)
+    Running (indigiolith)
+
 
 CURRENT BEST:
 Params41 prio=True
