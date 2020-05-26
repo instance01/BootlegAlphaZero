@@ -25,7 +25,7 @@ def get_params(env):
 
         # MCTS
         "gamma": .99,
-        "c": 1.,  # .001  # TODO Using puct now
+        "c": 1.,  # .001  # Using puct now.
         "simulations": 50,  # 1000
         "horizon": 200,
         "dirichlet_alpha": .3,
@@ -1290,10 +1290,12 @@ def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
 
     writer = SummaryWriter()
     for i in range(n_runs):
-        # TODO Also return last reward and add it to summary.
-        episodes, last_eval_len = alphazero.run(env, params, i, writer)
+        episodes, last_eval_len, last_tot_reward = alphazero.run(
+            env, params, i, writer
+        )
         writer.add_scalar('Summary/Length_All', last_eval_len, i)
         writer.add_scalar('Summary/Episodes_All', episodes, i)
+        writer.add_scalar('Summary/Rewards_All', last_tot_reward, i)
     print("Minutes:", (time.time() - start_time) / 60.)
 
 
