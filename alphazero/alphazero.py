@@ -212,7 +212,7 @@ def episode(
     return eval_length
 
 
-def run(env, params, desired_eval_len, n_run, writer=None):
+def run(env, params, n_run, writer=None):
     if not writer:
         writer = SummaryWriter()
     writer.add_text('Info/params/%d' % n_run, str(params), 0)
@@ -245,10 +245,10 @@ def run(env, params, desired_eval_len, n_run, writer=None):
             params,
             start_time
         )
-        if eval_len <= desired_eval_len:
+        if eval_len <= params["desired_eval_len"]:
             is_done_stably += 1
         else:
             is_done_stably = 0
-        if is_done_stably > 10:
+        if is_done_stably > params["n_desired_eval_len"]:
             break
     return i, eval_len

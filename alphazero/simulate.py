@@ -45,6 +45,8 @@ def get_params(env):
         "n_procs": 4,
         "n_actors": 20,  # 5000
         "train_steps": 2000,  # 700000
+        "desired_eval_len": 8,
+        "n_desired_eval_len": 10,
 
         # Other
         "reward_exponent": 1,
@@ -631,6 +633,7 @@ def get_params(env):
         "pb_c_init": .3,
         "horizon": 256,  # For 8x8
         "episodes": 200,
+        "desired_eval_len": 18,
     })
 
     params42 = copy.deepcopy(params41)
@@ -705,13 +708,19 @@ def get_params(env):
     params55.update({
         "simulations": 150,
         "horizon": 1024,  # For 16x16
+        "n_procs": 8,
+        "desired_eval_len": 40,
+        "n_desired_eval_len": 15,
     })
 
     params56 = copy.deepcopy(params41)
     params56.update({
         "simulations": 150,
         "horizon": 1024,  # For 16x16
-        "reward_exponent": 8
+        "reward_exponent": 8,
+        "n_procs": 8,
+        "desired_eval_len": 40,
+        "n_desired_eval_len": 15,
     })
 
     params57 = copy.deepcopy(params41)
@@ -722,7 +731,9 @@ def get_params(env):
         "reward_exponent": 8,
         "n_actors": 40,
         "train_steps": 6000,
-        "n_procs": 8
+        "n_procs": 8,
+        "desired_eval_len": 40,
+        "n_desired_eval_len": 15,
     })
 
     params58 = copy.deepcopy(params41)
@@ -733,7 +744,9 @@ def get_params(env):
         "reward_exponent": 8,
         "n_actors": 60,
         "train_steps": 8000,
-        "n_procs": 8
+        "n_procs": 8,
+        "desired_eval_len": 40,
+        "n_desired_eval_len": 15,
     })
 
     params59 = copy.deepcopy(params41)
@@ -742,7 +755,9 @@ def get_params(env):
         "simulations": 150,
         "horizon": 1024,
         "n_actors": 30,
-        "n_procs": 8
+        "n_procs": 8,
+        "desired_eval_len": 40,
+        "n_desired_eval_len": 15,
     })
 
     return {
@@ -1161,18 +1176,28 @@ Params54:
     Learnt 10/10. Very Slow.
 
 Params55: (16x16)
+    May25_00-09-37_amazonit.cip.ifi.lmu.de
+    Restarted.
     Running (amazonit)
 
 Params56: (16x16)
+    May25_21-39-12_sodalith.cip.ifi.lmu.de
+    Restarted.
     Running (sodalith)
 
 Params57: (16x16)
+    May25_21-54-59_beryll.cip.ifi.lmu.de
+    Restarted.
     Running (beryll)
 
 Params58: (16x16)
+    May25_22-00-59_danburit.cip.ifi.lmu.de
+    Restarted.
     Running (danburit)
 
 Params59: (16x16)
+    May25_22-05-18_indigiolith.cip.ifi.lmu.de
+    Restarted.
     Running (indigiolith)
 
 
@@ -1188,14 +1213,13 @@ def simulate_many_minidiscrete(game, key):
     env.goal_pos = [3, -3]
     env.borders = [7, -7]
     env.max_steps = 100
-    desired_len = 9
 
     params = get_params(env)[key]
     params["game"] = game
     params["key"] = key
 
     start_time = time.time()
-    episodes = [alphazero.run(env, params, desired_len, i) for i in range(10)]
+    episodes = [alphazero.run(env, params, i) for i in range(10)]
     print(episodes)
     print("Minutes:", (time.time() - start_time) / 60.)
 
@@ -1251,7 +1275,6 @@ def prepare_minigrid(game, params, pomdp):
 
 def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
     start_time = time.time()
-    desired_len = 18  # 8
 
     # Load params and run AlphaZero.
     # TODO Passing None -> lmao, refactor this
@@ -1268,9 +1291,7 @@ def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
     writer = SummaryWriter()
     for i in range(n_runs):
         # TODO Also return last reward and add it to summary.
-        episodes, last_eval_len = alphazero.run(
-            env, params, desired_len, i, writer
-        )
+        episodes, last_eval_len = alphazero.run(env, params, i, writer)
         writer.add_scalar('Summary/Length_All', last_eval_len, i)
         writer.add_scalar('Summary/Episodes_All', episodes, i)
     print("Minutes:", (time.time() - start_time) / 60.)
