@@ -183,7 +183,6 @@ class MCTS:
                 [self.root_node.state]
             )
             action_probs = action_probs[0]
-            # TODO Get actions_len from params
             alpha = self.dirichlet_alpha
             frac = self.dirichlet_frac
             noise = np.random.gamma(alpha, 1, self.params['n_actions'])

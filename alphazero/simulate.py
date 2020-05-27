@@ -17,11 +17,10 @@ import pdb
 pdb.set_trace()
 
 
-def get_params(env):
+def get_params():
     params1 = {
         "n_actions": 2,
         "n_input_features": 2,
-        "env": env,
 
         # MCTS
         "gamma": .99,
@@ -1214,7 +1213,8 @@ def simulate_many_minidiscrete(game, key):
     env.borders = [7, -7]
     env.max_steps = 100
 
-    params = get_params(env)[key]
+    params = get_params()[key]
+    params["env"] = env
     params["game"] = game
     params["key"] = key
 
@@ -1246,8 +1246,6 @@ def prepare_minigrid(game, params, pomdp):
     def step(cls, action):
         action = actions[action]
         obs, reward, done, _ = cls._step(action)
-        # TODO An idea was to quadruple reward to make good rewards more
-        # important.
         if pomdp:
             # TODO This is partially observable. Either return history or
             # addtionally the global state.
@@ -1277,8 +1275,7 @@ def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
     start_time = time.time()
 
     # Load params and run AlphaZero.
-    # TODO Passing None -> lmao, refactor this
-    params = get_params(None)[key]
+    params = get_params()[key]
     params["game"] = game
     params["key"] = key
     params["n_actions"] = 3
@@ -1297,9 +1294,6 @@ def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
         writer.add_scalar('Summary/Episodes_All', episodes, i)
         writer.add_scalar('Summary/Rewards_All', last_tot_reward, i)
     print("Minutes:", (time.time() - start_time) / 60.)
-
-
-# TODO Refactor simulate* functions.
 
 
 if __name__ == '__main__':

@@ -42,9 +42,10 @@ class ReplayBuffer:
             return self.buffer[np.random.choice(len(self.buffer))]
 
         p = self.get_rewards()
-        # TODO EXPLAIN -> So negative rewards also get a small chance
+        # Favor high rewards.
+        # Deeply negative rewards still get a high chance though.
+        # TODO Reconsider this.
         p *= p
-        # p += abs(p.min() * 2)
         if p.sum() == 0:
             return self.buffer[np.random.choice(len(self.buffer))]
         p /= p.sum()
@@ -124,10 +125,6 @@ def run_actor(env, params, mcts_agent, a2c_agent):
 
         action_probs, _ = a2c_agent.predict_policy([state])
 
-        # # TODO REMOVE
-        # if state[0] <= 2 and state[1] <= 2 and state[2] == 0:
-        #     print(state, action_probs.tolist()[0], mcts_action, np.max(mcts_action))
-
         next_state, reward, done, _ = env.step(sampled_action)
         sample = (state, reward, mcts_action)
         state = next_state
@@ -170,15 +167,20 @@ def episode(
         actor_lengths.append(len(game))
     pool.close()
 
-    # Print debug information
+    # Print debug information.
     print('')
     print(replay_buffer.get_rewards()[-n_actors:])
 
-    a = [np.max(s[-1]) for s in game for game in replay_buffer.buffer[-n_actors:]]
-    print("CONFIDENCE", np.mean(a), np.median(a))
+    # Print how confident the MCTS is.
+    max_action_probs = [
+        np.max(transaction[-1])
+        for transaction in game
+        for game in replay_buffer.buffer[-n_actors:]
+    ]
+    print("CONFIDENCE", np.mean(max_action_probs), np.median(max_action_probs))
 
     # Train network after self play.
-    samples_used = defaultdict(int)  # TODO REMOVE
+    samples_used = defaultdict(int)
     sample_lens = []
     losses = 0
 
@@ -207,9 +209,13 @@ def episode(
     eval_length, total_reward = evaluate(env, params, a2c_agent)
     writer.add_scalar('Eval/Length/%d' % n_run, eval_length, n_episode)
     writer.add_scalar('Eval/Reward/%d' % n_run, total_reward, n_episode)
-    writer.add_histogram('Actor/Sample_length/%d' % n_run, np.array(actor_lengths), n_episode)
-    writer.add_histogram('Train/Samples/%d' % n_run, np.array(sample_lens), n_episode)
-    return eval_length
+    writer.add_histogram(
+        'Actor/Sample_length/%d' % n_run, np.array(actor_lengths), n_episode
+    )
+    writer.add_histogram(
+        'Train/Samples/%d' % n_run, np.array(sample_lens), n_episode
+    )
+    return eval_length, total_reward
 
 
 def run(env, params, n_run, writer=None):
@@ -234,7 +240,7 @@ def run(env, params, n_run, writer=None):
     is_done_stably = 0
 
     for i in range(params["episodes"]):
-        eval_len = episode(
+        eval_len, total_reward = episode(
             writer,
             n_run,
             env,
@@ -251,4 +257,4 @@ def run(env, params, n_run, writer=None):
             is_done_stably = 0
         if is_done_stably > params["n_desired_eval_len"]:
             break
-    return i, eval_len
+    return i, eval_len, total_reward

@@ -11,7 +11,8 @@ env = gym.make('MiniDiscreteEnv-v0')
 env.goal_pos = [2, -2]
 env.borders = [5, -5]
 env.max_steps = 50
-params = get_params(env)
+params = get_params()
+params["env"] = env
 
 
 if __name__ == '__main__':
