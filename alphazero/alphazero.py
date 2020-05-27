@@ -182,7 +182,7 @@ def episode(
     # Train network after self play.
     samples_used = defaultdict(int)
     sample_lens = []
-    losses = 0
+    losses = []
 
     for i in range(train_steps):
         game = replay_buffer.sample()
@@ -194,7 +194,7 @@ def episode(
             sys.stdout.write(".")
             sys.stdout.flush()
         sample_lens.append(len(actions))
-        losses += loss.item()
+        losses.append(loss.item())
     print("")
     print(samples_used)
 
@@ -203,7 +203,7 @@ def episode(
         "AVG LENS",
         sum(sample_lens) / train_steps,
         " |AVG LOSS",
-        losses / train_steps,
+        sum(losses) / train_steps,
         " |TIME", time.time() - start_time
     )
     eval_length, total_reward = evaluate(env, params, a2c_agent)
@@ -214,6 +214,9 @@ def episode(
     )
     writer.add_histogram(
         'Train/Samples/%d' % n_run, np.array(sample_lens), n_episode
+    )
+    writer.add_histogram(
+        'Train/Loss/%d' % n_run, np.array(losses), n_episode
     )
     return eval_length, total_reward
 
