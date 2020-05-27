@@ -199,11 +199,12 @@ def episode(
     print(samples_used)
 
     print("")
+    avg_loss = sum(losses) / train_steps
     print(
         "AVG LENS",
         sum(sample_lens) / train_steps,
         " |AVG LOSS",
-        sum(losses) / train_steps,
+        avg_loss,
         " |TIME", time.time() - start_time
     )
     eval_length, total_reward = evaluate(env, params, a2c_agent)
@@ -218,6 +219,7 @@ def episode(
     writer.add_histogram(
         'Train/Loss/%d' % n_run, np.array(losses), n_episode
     )
+    writer.add_scalar('Train/AvgLoss/%d' % n_run, avg_loss, n_episode)
     return eval_length, total_reward
 
 
