@@ -36,6 +36,7 @@ def get_params():
 
         # A2C
         "alpha": .01,  # .01 (AlphaZero best); .001 (Imitation best)
+        "net_architecture": [64, 64],
 
         # AlphaZero
         "memory_capacity": 1000,

@@ -8,17 +8,26 @@ from torch.distributions import Categorical
 
 
 class A2CNet(nn.Module):
-    def __init__(self, n_input_features, n_actions):
+    def __init__(self, n_input_features, n_actions, net_architecture):
+        """Initialize a fully connected network based on a given architecture.
+
+        Params:
+            n_input_features: Size of input.
+            n_actions: Number of actions.
+            net_architecture: Layer sizes of a fully connected network, e.g.
+                [64, 64, 32, 32].
+        """
         super(A2CNet, self).__init__()
-        n_hidden_units = 64
-        self.fc_net = nn.Sequential(
-            nn.Linear(n_input_features, n_hidden_units),
-            nn.ReLU(),
-            nn.Linear(n_hidden_units, n_hidden_units),
-            nn.ReLU()
-        )
-        self.action_head = nn.Linear(n_hidden_units, n_actions)
-        self.value_head = nn.Linear(n_hidden_units, 1)
+        net = []
+        n_features_before = n_input_features
+        for layer_features in net_architecture:
+            net.append(nn.Linear(n_features_before, layer_features))
+            net.append(nn.ReLU())
+            n_features_before = layer_features
+
+        self.fc_net = nn.Sequential(*net)
+        self.action_head = nn.Linear(n_features_before, n_actions)
+        self.value_head = nn.Linear(n_features_before, 1)
 
     def forward(self, x):
         x = x.view(x.size(0), -1)
@@ -37,7 +46,9 @@ class A2CLearner:
         self.transitions = []
         self.device = torch.device("cpu")
         self.policy_net = A2CNet(
-            self.n_input_features, self.n_actions
+            self.n_input_features,
+            self.n_actions,
+            params["net_architecture"]
         ).to(self.device)
         self.policy_net_copy = copy.deepcopy(self.policy_net)
         self.policy_optimizer = torch.optim.Adam(
