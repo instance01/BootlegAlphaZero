@@ -760,6 +760,11 @@ def get_params():
         "n_desired_eval_len": 15,
     })
 
+    params60 = copy.deepcopy(params57)
+    params60.update({
+        "horizon": 300
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -822,6 +827,7 @@ def get_params():
         "57": params57,
         "58": params58,
         "59": params59,
+        "60": params60,
     }
 
 
@@ -1183,7 +1189,9 @@ Params55: (16x16)
 Params56: (16x16)
     May25_21-39-12_sodalith.cip.ifi.lmu.de
     Restarted.
-    Running (sodalith)
+    May26_08-55-49_sodalith.cip.ifi.lmu.de
+    Minutes: 2877.46658252875
+    Learnt 4/10. Did not learn 6/10.
 
 Params57: (16x16)
     May25_21-54-59_beryll.cip.ifi.lmu.de
@@ -1199,6 +1207,9 @@ Params59: (16x16)
     May25_22-05-18_indigiolith.cip.ifi.lmu.de
     Restarted.
     Running (indigiolith)
+
+Params60: (16x16)
+    Running (sodalith)
 
 
 CURRENT BEST:
