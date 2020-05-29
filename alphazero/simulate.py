@@ -762,7 +762,31 @@ def get_params():
 
     params60 = copy.deepcopy(params57)
     params60.update({
-        "horizon": 300
+        "horizon": 300,
+    })
+
+    params61 = copy.deepcopy(params57)
+    params61.update({
+        "n_procs": 12,
+        "reward_exponent": 16
+    })
+
+    params62 = copy.deepcopy(params57)
+    params62.update({
+        "n_procs": 12,
+        "net_architecture": [128, 64]
+    })
+
+    params63 = copy.deepcopy(params57)
+    params63.update({
+        "n_procs": 12,
+        "net_architecture": [128, 128, 64, 64]
+    })
+
+    params64 = copy.deepcopy(params57)
+    params64.update({
+        "n_procs": 12,
+        "alpha": .002
     })
 
     return {
@@ -828,6 +852,10 @@ def get_params():
         "58": params58,
         "59": params59,
         "60": params60,
+        "61": params61,
+        "62": params62,
+        "63": params63,
+        "64": params64,
     }
 
 
@@ -1184,7 +1212,9 @@ Params54:
 Params55: (16x16)
     May25_00-09-37_amazonit.cip.ifi.lmu.de
     Restarted.
-    Running (amazonit)
+    May26_08-54-04_amazonit.cip.ifi.lmu.de
+    Minutes: 4302.391547409693
+    Learnt 3/10. Did not learn 7/10.
 
 Params56: (16x16)
     May25_21-39-12_sodalith.cip.ifi.lmu.de
@@ -1196,12 +1226,16 @@ Params56: (16x16)
 Params57: (16x16)
     May25_21-54-59_beryll.cip.ifi.lmu.de
     Restarted.
-    Running (beryll)
+    May26_08-55-51_beryll.cip.ifi.lmu.de
+    Minutes: 4159.658444670836
+    Learnt 8/10. Did not learn 2/10.
 
 Params58: (16x16)
     May25_22-00-59_danburit.cip.ifi.lmu.de
     Restarted.
-    Running (danburit)
+    May26_08-55-55_danburit.cip.ifi.lmu.de
+    Minutes: 5006.399745408694
+    Learnt 7/10. Did not learn 3/10.
 
 Params59: (16x16)
     May25_22-05-18_indigiolith.cip.ifi.lmu.de
@@ -1210,6 +1244,18 @@ Params59: (16x16)
 
 Params60: (16x16)
     Running (sodalith)
+
+Params61: (16x16)
+    Running (amazonit)
+
+Params62: (16x16)
+    Running (beryll)
+
+Params63: (16x16)
+    Running (danburit)
+
+Params64: (16x16)
+    Running (euklas)
 
 
 CURRENT BEST:
