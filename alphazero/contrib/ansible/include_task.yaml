@@ -1,0 +1,4 @@
+- name: Include vars
+  include_vars:
+    file: vars.yaml
+    name: localvars

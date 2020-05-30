@@ -13,9 +13,6 @@ import gym_minigrid  # noqa: F401
 import alphazero
 from torch.utils.tensorboard import SummaryWriter
 
-import pdb
-pdb.set_trace()
-
 
 def get_params():
     params1 = {

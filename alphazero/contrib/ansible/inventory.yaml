@@ -1,0 +1,8 @@
+all:
+  hosts:
+    amazonit:
+    beryll:
+    danburit:
+    sodalith:
+    indigiolith:
+    euklas:

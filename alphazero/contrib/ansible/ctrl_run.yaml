@@ -1,0 +1,30 @@
+- hosts: amazonit
+  gather_facts: no
+  tasks:
+  - include: include_task.yaml
+  - include: run_task.yaml
+- hosts: beryll
+  gather_facts: no
+  tasks:
+  - include: include_task.yaml
+  - include: run_task.yaml
+- hosts: danburit
+  gather_facts: no
+  tasks:
+  - include: include_task.yaml
+  - include: run_task.yaml
+- hosts: sodalith
+  gather_facts: no
+  tasks:
+  - include: include_task.yaml
+  - include: run_task.yaml
+- hosts: indigiolith
+  gather_facts: no
+  tasks:
+  - include: include_task.yaml
+  - include: run_task.yaml
+- hosts: euklas
+  gather_facts: no
+  tasks:
+  - include: include_task.yaml
+  - include: run_task.yaml
