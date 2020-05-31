@@ -1,4 +1,5 @@
 import copy
+from pydoc import locate
 
 import numpy as np
 import torch
@@ -55,6 +56,11 @@ class A2CLearner:
             self.policy_net.parameters(),
             lr=params["alpha"]
         )
+        if params["schedule_alpha"]:
+            scheduler = locate(
+                'torch.optim.lr_scheduler.%s' % params["scheduler_class"]
+            )
+            self.policy_optimizer = scheduler(self.policy_optimizer)
 
     def policy(self, state):
         """Samples a new action using the policy network.

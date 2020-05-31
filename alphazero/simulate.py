@@ -34,6 +34,9 @@ def get_params():
         # A2C
         "alpha": .01,  # .01 (AlphaZero best); .001 (Imitation best)
         "net_architecture": [64, 64],
+        "schedule_alpha": False,
+        "scheduler_class": "ExponentialLR",
+        "scheduler_gamma": .995,
 
         # AlphaZero
         "memory_capacity": 1000,
@@ -759,7 +762,7 @@ def get_params():
 
     params60 = copy.deepcopy(params57)
     params60.update({
-        "horizon": 300,
+        "horizon": 300,  # Bug: This had no effect !!
     })
 
     params61 = copy.deepcopy(params57)
@@ -796,7 +799,7 @@ def get_params():
     params66 = copy.deepcopy(params57)
     params66.update({
         "n_procs": 12,
-        "horizon": 200
+        "horizon": 200  # Bug: This had no effect !!
     })
 
     # Ideas:
