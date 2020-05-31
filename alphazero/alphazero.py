@@ -228,7 +228,7 @@ def episode(
     )
     # TODO The decision to only use the first param group might be dubious.
     # Keep that in mind. For now it is fine, I checked.
-    writer.add_histogram(
+    writer.add_scalar(
         'Train/LearningRate/%d' % n_run,
         a2c_agent.policy_optimizer.param_groups[0]['lr'],
         n_episode

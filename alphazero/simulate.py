@@ -1360,6 +1360,41 @@ class Action(Enum):
     forward = 2
 
 
+class EnvWrapper:
+    def __init__(self, env, params, actions, pomdp):
+        self.env = env
+        self.params = params
+        self.actions = actions
+        self.pomdp = pomdp
+
+    def step(self, action):
+        action = self.actions[action]
+        obs, reward, done, _ = self.env.step(action)
+        if self.pomdp:
+            # TODO This is partially observable. Either return history or
+            # addtionally the global state.
+            return (
+                obs['image'].flatten(),
+                reward ** self.params["reward_exponent"],
+                done,
+                None
+            )
+        else:
+            return (
+                np.append(self.env.agent_pos, self.env.agent_dir),
+                reward ** self.params["reward_exponent"],
+                done,
+                None
+            )
+
+    def reset(self):
+        obs = self.env.reset()
+        if self.pomdp:
+            return obs['image'].flatten()
+        else:
+            return np.append(self.env.agent_pos, self.env.agent_dir)
+
+
 def prepare_minigrid(game, params, pomdp):
     env = gym.make('MiniGrid-Empty-%s-v0' % game)
 
@@ -1371,33 +1406,7 @@ def prepare_minigrid(game, params, pomdp):
         2: Action.forward
     }
     env.actions = Action
-
-    def step(cls, action):
-        action = actions[action]
-        obs, reward, done, _ = cls._step(action)
-        if pomdp:
-            # TODO This is partially observable. Either return history or
-            # addtionally the global state.
-            return obs['image'].flatten(), reward ** params["reward_exponent"], done, None
-        else:
-            return np.append(cls.agent_pos, cls.agent_dir), reward ** params["reward_exponent"], done, None
-    env._step = env.step
-    env.__class__._step = env.__class__.step
-    env.step = step.__get__(env, env.__class__)
-    env.__class__.step = step.__get__(env, env.__class__)
-
-    def reset(cls):
-        obs = cls._reset()
-        if pomdp:
-            return obs['image'].flatten()
-        else:
-            return np.append(cls.agent_pos, cls.agent_dir)
-    env._reset = env.reset
-    env.__class__._reset = env.__class__.reset
-    env.reset = reset.__get__(env, env.__class__)
-    env.__class__.reset = reset.__get__(env, env.__class__)
-
-    return env
+    return EnvWrapper(env, params, actions, pomdp)
 
 
 def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
