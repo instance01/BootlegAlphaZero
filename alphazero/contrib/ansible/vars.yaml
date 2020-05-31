@@ -1,18 +1,18 @@
 amazonit:
   game: 16x16
-  params: 41
+  params: 61
 beryll:
   game: 16x16
-  params: 41
+  params: 62
 danburit:
   game: 16x16
-  params: 41
+  params: 63
 sodalith:
   game: 16x16
-  params: 41
+  params: 66
 indigiolith:
   game: 16x16
-  params: 41
+  params: 65
 euklas:
   game: 16x16
-  params: 41
+  params: 64

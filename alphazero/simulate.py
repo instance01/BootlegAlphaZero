@@ -786,6 +786,24 @@ def get_params():
         "alpha": .002
     })
 
+    params65 = copy.deepcopy(params57)
+    params65.update({
+        "n_procs": 12,
+        "alpha": .005,
+        "train_steps": 7000
+    })
+
+    params66 = copy.deepcopy(params57)
+    params66.update({
+        "n_procs": 12,
+        "horizon": 200
+    })
+
+    # Ideas:
+    # "reward_exponent": 32,
+    # "reward_exponent": 1,
+    # params65 but with different net architecture
+
     return {
         "1": params1,
         "2": params2,
@@ -853,6 +871,8 @@ def get_params():
         "62": params62,
         "63": params63,
         "64": params64,
+        "65": params65,
+        "66": params66,
     }
 
 
@@ -1237,10 +1257,18 @@ Params58: (16x16)
 Params59: (16x16)
     May25_22-05-18_indigiolith.cip.ifi.lmu.de
     Restarted.
-    Running (indigiolith)
+    May26_08-56-09_indigiolith.cip.ifi.lmu.de
+    Minutes: 5517.272387822469
+    Learnt 7/10. Did not learn 3/10.
+    Once it straight up did not eval a good path even ONCE, for 300 episodes.
 
 Params60: (16x16)
-    Running (sodalith)
+    Stopped early due to forced restart of the system.
+    May28_23-41-36_sodalith.cip.ifi.lmu.de
+    Learnt 6/8. Did not learn 2/8.
+    Minutes: ~2700
+    Doesnt seem to give much of an advantage. Need to try even crazier values.
+    But it works.
 
 Params61: (16x16)
     Running (amazonit)
@@ -1250,14 +1278,22 @@ Params62: (16x16)
 
 Params63: (16x16)
     Running (danburit)
+    Crashed - Restarted
 
 Params64: (16x16)
     Running (euklas)
+
+Params65: (16x16)
+    Running indigiolith
+
+Params66: (16x16)
+    Running sodalith
 
 
 CURRENT BEST:
 Params41 prio=True
 Params45 prio=False
+Params57 prio=True (8x8, 16x16)
 
 """
 
