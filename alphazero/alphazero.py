@@ -115,7 +115,7 @@ def run_actor(env, params, mcts_agent, a2c_agent):
     state = env.reset()
     done = False
     game = []
-    while not done:
+    for _ in range(params["horizon"]):
         mcts_action = mcts_agent.policy(env, state)
         sampled_action = np.random.choice(
             list(range(params["n_actions"])),
@@ -129,6 +129,9 @@ def run_actor(env, params, mcts_agent, a2c_agent):
         sample = (state, reward, mcts_action)
         state = next_state
         game.append(sample)
+
+        if done:
+            break
 
     print(mcts_actions)
 
@@ -155,7 +158,7 @@ def episode(
 
     actor_lengths = []
 
-    # Run self play games in 4 parallel processes.
+    # Run self play games in n_procs parallel processes.
     pool = multiprocessing.Pool(processes=params["n_procs"])
     multiple_results = [
         pool.apply_async(run_actor, (env, params, mcts_agent, a2c_agent))
