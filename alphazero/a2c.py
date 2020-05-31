@@ -60,7 +60,9 @@ class A2CLearner:
             scheduler = locate(
                 'torch.optim.lr_scheduler.%s' % params["scheduler_class"]
             )
-            self.policy_optimizer = scheduler(self.policy_optimizer)
+            self.scheduler = scheduler(
+                self.policy_optimizer, params["scheduler_gamma"]
+            )
 
     def policy(self, state):
         """Samples a new action using the policy network.

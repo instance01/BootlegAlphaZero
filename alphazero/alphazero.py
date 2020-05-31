@@ -198,6 +198,10 @@ def episode(
             sys.stdout.flush()
         sample_lens.append(len(actions))
         losses.append(loss.item())
+
+    if params["schedule_alpha"]:
+        a2c_agent.scheduler.step()
+
     print("")
     print(samples_used)
 
@@ -221,6 +225,13 @@ def episode(
     )
     writer.add_histogram(
         'Train/Loss/%d' % n_run, np.array(losses), n_episode
+    )
+    # TODO The decision to only use the first param group might be dubious.
+    # Keep that in mind. For now it is fine, I checked.
+    writer.add_histogram(
+        'Train/LearningRate/%d' % n_run,
+        a2c_agent.policy_optimizer.param_groups[0]['lr'],
+        n_episode
     )
     writer.add_scalar('Train/AvgLoss/%d' % n_run, avg_loss, n_episode)
     return eval_length, total_reward

@@ -802,6 +802,29 @@ def get_params():
         "horizon": 200  # Bug: This had no effect !!
     })
 
+    params67 = copy.deepcopy(params57)
+    params67.update({
+        "n_procs": 12,
+        "alpha": .01,
+        "train_steps": 8000,
+        "schedule_alpha": True
+    })
+
+    params68 = copy.deepcopy(params57)
+    params68.update({
+        "n_procs": 12,
+        "reward_exponent": 1,
+        "train_steps": 8000
+    })
+
+    params69 = copy.deepcopy(params57)
+    params69.update({
+        "n_procs": 12,
+        "alpha": .001,
+        "train_steps": 8000,
+        "schedule_alpha": True
+    })
+
     # Ideas:
     # "reward_exponent": 32,
     # "reward_exponent": 1,
@@ -876,6 +899,9 @@ def get_params():
         "64": params64,
         "65": params65,
         "66": params66,
+        "67": params67,
+        "68": params68,
+        "69": params69,
     }
 
 
@@ -1291,6 +1317,15 @@ Params65: (16x16)
 
 Params66: (16x16)
     Running sodalith
+
+Params67: (16x16)
+    Running peridot
+
+Params68: (16x16)
+    Running petalit
+
+Params69: (16x16)
+    Running zirkon
 
 
 CURRENT BEST:
