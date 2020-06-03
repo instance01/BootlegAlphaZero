@@ -4,6 +4,7 @@ import time
 import copy
 import functools
 from enum import Enum
+from multiprocessing import set_start_method
 
 import gym
 import numpy as np
@@ -825,10 +826,69 @@ def get_params():
         "schedule_alpha": True
     })
 
-    # Ideas:
-    # "reward_exponent": 32,
-    # "reward_exponent": 1,
-    # params65 but with different net architecture
+    params70 = copy.deepcopy(params57)
+    params70.update({
+        "n_procs": 12,
+        "n_actors": 10,
+        "simulations": 50,
+        "train_steps": 1000,
+        "episodes": 300,
+    })
+
+    params71 = copy.deepcopy(params57)
+    params71.update({
+        "n_procs": 12,
+        "n_actors": 10,
+        "simulations": 50,
+        "train_steps": 2000,
+        "episodes": 300,
+    })
+
+    params72 = copy.deepcopy(params69)
+    params72.update({
+        # Includes schedule_alpha=True
+        "train_steps": 9000
+    })
+
+    params73 = copy.deepcopy(params69)
+    params73.update({
+        # Includes schedule_alpha=True
+        "scheduler_gamma": .99
+    })
+
+    params74 = copy.deepcopy(params69)
+    params74.update({
+        # Includes schedule_alpha=True
+        "prioritized_sampling": False
+    })
+
+    params75 = copy.deepcopy(params69)
+    params75.update({
+        # Includes schedule_alpha=True
+        "prioritized_sampling": False,
+        "simulations": 50,
+        "n_actors": 30,
+        "train_steps": 3000,
+    })
+
+    params76 = copy.deepcopy(params69)
+    params76.update({
+        # Includes schedule_alpha=True
+        "net_architecture": [128, 128, 64, 64]
+    })
+
+    # basically merge of params71 and params69
+    params77 = copy.deepcopy(params69)
+    params77.update({
+        # Includes schedule_alpha=True
+        "n_procs": 12,
+        "n_actors": 10,
+        "simulations": 50,
+        "train_steps": 2000,
+        "episodes": 300,
+    })
+
+    # TODO: merge of params70 and params69?
 
     return {
         "1": params1,
@@ -902,6 +962,14 @@ def get_params():
         "67": params67,
         "68": params68,
         "69": params69,
+        "70": params70,
+        "71": params71,
+        "72": params72,
+        "73": params73,
+        "74": params74,
+        "75": params75,
+        "76": params76,
+        "77": params77,
     }
 
 
@@ -1300,38 +1368,100 @@ Params60: (16x16)
     But it works.
 
 Params61: (16x16)
-    Running (amazonit)
+    May31_06-48-23_amazonit.cip.ifi.lmu.de
+    Minutes: 4144.575373788674
+    Learnt 7/10. Did not learn 3/10. (but one more could be considered learnt)
+    Increasing reward exponent to this amount has thus no effect.
 
 Params62: (16x16)
-    Running (beryll)
-
-Params63: (16x16)
-    Running (danburit)
-    Crashed - Restarted
+    May31_06-48-23_beryll.cip.ifi.lmu.de
+    Minutes: 3837.1865882476172
+    Learnt 8/10. Did not learn 2/10. Often learnt quite quickly (in terms of
+    episodes)
+    Increasing net architecture might be successful. Unfortunately danburit is
+    having issues, else I would already know.
 
 Params64: (16x16)
-    Running (euklas)
+    May31_06-48-42_euklas.cip.ifi.lmu.de
+    Minutes: 3657.1515263160068
+    Learnt 6/10. Did not learn 4/10.
+    Increasing alpha on its own does not help much.
 
 Params65: (16x16)
-    Running indigiolith
+    Cancelled earlier due to bad performance.
+    May31_06-48-30_indigiolith.cip.ifi.lmu.de
+    Minutes: ~3780 (but for 9 simuls)
+    Learnt 5/9. Did not learn 4/9.
+    Increasing alpha and train steps does not help much.
 
 Params66: (16x16)
-    Running sodalith
+    Cancelled earlier due to bad performance.
+    May31_17-10-03_sodalith.cip.ifi.lmu.de
+    Minutes: ~3840 (but for 9 simuls)
+    Learnt 3/9. Did not learn 6/9. (but one more could be considered learnt)
+    Horizon is a bad idea, at least with this config. Seems to work for MuZero
+    though. Weird.
 
 Params67: (16x16)
-    Running peridot
+    Cancelled earlier due to bad performance.
+    May31_17-10-09_peridot.cip.ifi.lmu.de
+    Minutes: ~3660 (for 7 simuls only!)
+    Learnt 1/7. Did not learn 6/7.
+    Idea was to test scheduling alpha.
+    However, alpha was set too high.
+    For an experiment with current best alpha, see params69.
 
 Params68: (16x16)
-    Running petalit
+    May31_17-10-16_petalit.cip.ifi.lmu.de
+    Crashed: Exploding gradients (?)
+    Restarted.
+    Running (petalit)
 
 Params69: (16x16)
-    Running zirkon
+    May31_17-10-22_zirkon.cip.ifi.lmu.de
+    Minutes: 4276.210630186399
+    Learnt 9/10. Did not learn 1/10.
+    Worked well, but is it much of an improvement to version without
+    scheduling? Warrants some more experiments.
+
+// moved here for visibility
+Params63: (16x16)
+    Crashed - Restarted (danburit
+    Crashed - possibly memory leak.
+        https://pythonspeed.com/articles/python-multiprocessing/
+    Restarted with fix (set_start_method("spawn"))
+    Running (heliodor)
+
+Params70:
+    Running (amazonit)
+
+Params71:
+    Running (beryll)
+
+Params72:
+    Running (sodalith)
+
+Params73:
+    Running (indigiolith)
+
+Params74:
+    Running (euklas)
+
+Params75:
+    Running (peridot)
+
+Params76:
+    Running (zirkon)
+
+Params77:
+    Running (goshenit)
 
 
 CURRENT BEST:
 Params41 prio=True
 Params45 prio=False
 Params57 prio=True (8x8, 16x16)
+Params69 prio=True (16x16)
 
 """
 
@@ -1435,6 +1565,8 @@ def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
 
 
 if __name__ == '__main__':
+    set_start_method("spawn")
+
     games = {
         'minidiscrete': (simulate_many_minidiscrete,),
         '5x5': (simulate_many_minigrid,),

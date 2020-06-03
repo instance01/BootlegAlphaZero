@@ -2,10 +2,11 @@ all:
   hosts:
     amazonit:
     beryll:
-    danburit:
     sodalith:
     indigiolith:
     euklas:
     peridot:
     petalit:
     zirkon:
+    heliodor:
+    goshenit:

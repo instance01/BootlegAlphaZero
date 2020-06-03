@@ -8,11 +8,6 @@
   tasks:
   - include: include_task.yaml
   - include: run_task.yaml
-- hosts: danburit
-  gather_facts: no
-  tasks:
-  - include: include_task.yaml
-  - include: run_task.yaml
 - hosts: sodalith
   gather_facts: no
   tasks:
@@ -39,6 +34,16 @@
   - include: include_task.yaml
   - include: run_task.yaml
 - hosts: zirkon
+  gather_facts: no
+  tasks:
+  - include: include_task.yaml
+  - include: run_task.yaml
+- hosts: heliodor
+  gather_facts: no
+  tasks:
+  - include: include_task.yaml
+  - include: run_task.yaml
+- hosts: goshenit
   gather_facts: no
   tasks:
   - include: include_task.yaml
