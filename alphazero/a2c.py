@@ -51,7 +51,7 @@ class A2CLearner:
             self.n_actions,
             params["net_architecture"]
         ).to(self.device)
-        self.policy_net_copy = copy.deepcopy(self.policy_net)
+        # self.policy_net_copy = copy.deepcopy(self.policy_net)
         self.policy_optimizer = torch.optim.Adam(
             self.policy_net.parameters(),
             lr=params["alpha"]

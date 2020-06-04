@@ -52,6 +52,24 @@ class ReplayBuffer:
         return self.buffer[np.random.choice(len(self.buffer), p=p)]
 
 
+def evaluate_quick(env, params, a2c_agent):
+    state = env.reset()
+
+    done = False
+    total_reward = 0
+    actions = ""
+    while not done:
+        action_probs, val = a2c_agent.predict_policy([state])
+
+        action = np.argmax(action_probs.tolist()[0])
+
+        state, reward, done, _ = env.step(action)
+        total_reward += reward
+        actions += str(action)
+
+    return actions, total_reward
+
+
 def evaluate_with_policy(env, params, a2c_agent, policy):
     state = env.reset()
 
@@ -82,22 +100,25 @@ def evaluate_with_policy(env, params, a2c_agent, policy):
 def evaluate(env, params, a2c_agent):
     env = copy.deepcopy(env)
 
-    def action_policy(i, state, action_probs, vals):
-        # Policy that takes the argmax of the action probabilities.
-        if i < 10:
-            print(state, action_probs.detach().tolist(), vals)
-        return np.argmax(action_probs.tolist()[0])
+    # TODO: Just for debugging.
+    # def action_policy(i, state, action_probs, vals):
+    #     # Policy that takes the argmax of the action probabilities.
+    #     if i < 10:
+    #         print(state, action_probs.detach().tolist(), vals)
+    #     return np.argmax(action_probs.tolist()[0])
 
-    def val_policy(i, state, action_probs, vals):
-        # Policy that takes the argmax of the value.
-        if i < 10:
-            print(state, vals)
-        return np.argmax(vals)
+    # def val_policy(i, state, action_probs, vals):
+    #     # Policy that takes the argmax of the value.
+    #     if i < 10:
+    #         print(state, vals)
+    #     return np.argmax(vals)
 
-    actions, total_reward = evaluate_with_policy(
-        env, params, a2c_agent, action_policy
-    )
-    evaluate_with_policy(env, params, a2c_agent, val_policy)
+    # actions, total_reward = evaluate_with_policy(
+    #     env, params, a2c_agent, action_policy
+    # )
+    # evaluate_with_policy(env, params, a2c_agent, val_policy)
+
+    actions, total_reward = evaluate_quick(env, params, a2c_agent)
     print("EVAL", actions, total_reward)
     return len(actions), total_reward
 
@@ -106,8 +127,11 @@ def run_actor(env, params, mcts_agent, a2c_agent):
     # Since we're running in parallel.
     np.random.seed(int.from_bytes(os.urandom(4), byteorder='little'))
     env = copy.deepcopy(env)
-    mcts_agent = copy.deepcopy(mcts_agent)
-    mcts_agent.reset_policy_cache()
+
+    # TODO KEEP THIS IN MIND! We are not copying mcts agent any longer since it
+    # is quite costly to do so.
+    # mcts_agent = copy.deepcopy(mcts_agent)
+    # mcts_agent.reset_policy_cache()
 
     # TODO REMOVE
     mcts_actions = ""
@@ -149,6 +173,7 @@ def episode(
             params,
             start_time
         ):
+    a2c_agent.policy_net.eval()
     n_actors = params["n_actors"]
     train_steps = params["train_steps"]
 
@@ -187,6 +212,8 @@ def episode(
     sample_lens = []
     losses = []
 
+    a2c_agent.policy_net.train()
+
     for i in range(train_steps):
         game = replay_buffer.sample()
         loss = a2c_agent.update(game)
@@ -204,6 +231,8 @@ def episode(
 
     print("")
     print(samples_used)
+
+    a2c_agent.policy_net.eval()
 
     print("")
     avg_loss = sum(losses) / train_steps

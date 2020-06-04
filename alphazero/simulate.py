@@ -422,11 +422,12 @@ def get_params():
         "alpha": .001,
         "simulations": 50,
         "prioritized_sampling": True,
-        "n_actors": 1,
+        "n_actors": 2,
         "train_steps": 1000,
         "dirichlet_alpha": .3,
         "dirichlet_frac": .5,
-        "episodes": 1,
+        "episodes": 2,
+        # "horizon": 1024
     })
 
     params37 = copy.deepcopy(params1)
