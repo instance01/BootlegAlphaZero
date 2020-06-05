@@ -44,7 +44,6 @@ class A2CLearner:
         self.gamma = params["gamma"]
         self.n_actions = params["n_actions"]
         self.n_input_features = params["n_input_features"]
-        self.transitions = []
         self.device = torch.device("cpu")
         self.policy_net = A2CNet(
             self.n_input_features,
