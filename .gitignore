@@ -2,6 +2,7 @@ bak/
 *bak
 *.swp
 *.dbg
+*.pyc
 steps.txt
 __pycache__
 CMakeFiles
