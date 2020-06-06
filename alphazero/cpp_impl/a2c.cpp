@@ -61,8 +61,7 @@ A2CNetImpl::forward(torch::Tensor input) {
 }
 
 A2CLearner::A2CLearner(
-    std::map<std::string,
-    std::variant<double, std::string, std::vector<int>, int>> params
+    Params params
 ) {
   this->params = params;
   this->policy_net = A2CNet(
@@ -83,6 +82,9 @@ A2CLearner::A2CLearner(
 // TODO For now support 2D only.
 std::pair<torch::Tensor, torch::Tensor>
 A2CLearner::predict_policy_single(std::vector<double> sample) {
+  // TODO
+  // This could've been used to make a 2d array out of a single sample
+  // x.view(-1, 3)  // where 3 is sample size
   return predict_policy({sample});
 }
 
@@ -152,18 +154,4 @@ A2CLearner::update(Game game) {
   policy_optimizer->step();
 
   return loss;
-}
-
-
-int main() {
-    std::map<std::string, std::variant<double, std::string, std::vector<int>, int>> params;
-    params["n_input_features"] = 3;
-    params["n_actions"] = 3;
-    params["net_architecture"] = std::vector<int>{64, 64};
-    params["alpha"] = 0.01;
-    auto a2c_agent = A2CLearner(params);
-    torch::Tensor policy;
-    torch::Tensor value;
-    std::tie(policy, value) = a2c_agent.predict_policy({{1, 2, 3}});
-    std::cout << policy.detach() << " " << value.detach() << std::endl;
 }

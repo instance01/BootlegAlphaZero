@@ -1,9 +1,7 @@
 #ifndef A2C_HEADER
 #define A2C_HEADER
 #include <string>
-#include <map>
 #include <any>
-#include <variant>
 #include <iostream>
 
 #include <torch/torch.h>
@@ -15,6 +13,7 @@
 #include <c10/core/DeviceType.h>
 
 #include "game.hpp"
+#include "params.hpp"
 
 
 struct A2CNetImpl : public torch::nn::Cloneable<A2CNetImpl> {
@@ -44,7 +43,7 @@ TORCH_MODULE(A2CNet);
 
 class A2CLearner {
   public:
-    std::map<std::string, std::variant<double, std::string, std::vector<int>, int>> params;
+    Params params;
     A2CNet policy_net;
     std::shared_ptr<torch::optim::Adam> policy_optimizer;
 
@@ -52,8 +51,7 @@ class A2CLearner {
     ~A2CLearner() {};
 
     A2CLearner(
-        std::map<std::string,
-        std::variant<double, std::string, std::vector<int>, int>> params
+        Params params
     );
 
     std::pair<torch::Tensor, torch::Tensor> predict_policy_single(std::vector<double> sample);
