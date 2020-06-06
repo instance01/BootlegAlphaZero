@@ -31,7 +31,7 @@ ReplayBuffer::sample() {
   std::random_device rd;
   std::mt19937 generator(rd());
   auto rewards = get_rewards();
-  std::discrete_distribution<double> distribution(rewards.begin(), rewards.end());
+  std::discrete_distribution<int> distribution(rewards.begin(), rewards.end());
   int idx = distribution(generator);
   std::cout << "idx " << idx << std::endl;
   return buffer[idx];

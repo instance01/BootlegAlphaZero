@@ -13,6 +13,6 @@ class Game {
       std::vector<double> rewards,
       std::vector<std::vector<double>> mcts_actions
     ) : states(states), rewards(rewards), mcts_actions(mcts_actions) {};
-    ~Game();
+    ~Game() {};
 };
 #endif
