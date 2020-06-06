@@ -1,0 +1,8 @@
+BUILD
+sudo docker build -t grab0 -f Dockerfile .
+
+This also requires:
+https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip
+in the ../cpp_impl/dist/ folder.
+RUN
+sudo docker run -v $(pwd):/app --privileged -it grab0 bash
