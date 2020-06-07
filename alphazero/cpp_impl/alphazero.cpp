@@ -33,9 +33,14 @@ std::pair<int, double> evaluate(Env env, Params params, A2CLearner a2c_agent) {
   return std::make_pair(actions.length(), total_reward);
 }
 
-// Game run_actor(Env env, Params params, MCTS mcts_agent, A2CLearner a2c_agent) {
-// 
-// }
+std::shared_ptr<Game> run_actor(Env env, Params params, MCTS mcts_agent, A2CLearner a2c_agent) {
+  // TODO
+  std::vector<std::vector<double>> states = {{}};
+  std::vector<double> rewards = {};
+  std::vector<std::vector<double>> mcts_actions = {{}};
+
+  return std::make_shared<Game>(states, rewards, mcts_actions);
+}
 
 int main() {
   test_all();
