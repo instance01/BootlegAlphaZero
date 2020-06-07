@@ -869,7 +869,7 @@ def get_params():
         "prioritized_sampling": False,
         "simulations": 50,
         "n_actors": 30,
-        "train_steps": 3000,
+        "train_steps": 3000
     })
 
     params76 = copy.deepcopy(params69)
@@ -887,6 +887,56 @@ def get_params():
         "simulations": 50,
         "train_steps": 2000,
         "episodes": 300,
+    })
+
+    # Basically params72 but let's explore further
+    params78 = copy.deepcopy(params69)
+    params78.update({
+        # Includes schedule_alpha=True
+        "n_procs": 8,
+        "train_steps": 10000
+    })
+
+    params79 = copy.deepcopy(params75)
+    params79.update({
+        "n_procs": 8,
+        "episodes": 500
+    })
+
+    params80 = copy.deepcopy(params68)
+    params80.update({
+        "n_procs": 8,
+        "prioritized_sampling": False
+    })
+
+    params81 = copy.deepcopy(params79)
+    params81.update({
+        "n_procs": 8,
+        "prioritized_sampling": False,
+        "reward_exponent": 1
+    })
+
+    params82 = copy.deepcopy(params68)
+    params82.update({
+        "n_procs": 8,
+        "simulations": 50,
+        "n_actors": 50,
+        "prioritized_sampling": False
+    })
+
+    params83 = copy.deepcopy(params75)
+    params83.update({
+        "n_procs": 8,
+        "episodes": 500,
+        "scheduler_gamma": .99,
+        "train_steps": 4000
+    })
+
+    params84 = copy.deepcopy(params69)
+    params84.update({
+        "n_procs": 8,
+        "train_steps": 10000,
+        "simulations": 50
     })
 
     # TODO: merge of params70 and params69?
@@ -971,6 +1021,13 @@ def get_params():
         "75": params75,
         "76": params76,
         "77": params77,
+        "78": params78,
+        "79": params79,
+        "80": params80,
+        "81": params81,
+        "82": params82,
+        "83": params83,
+        "84": params84,
     }
 
 
@@ -1382,6 +1439,9 @@ Params62: (16x16)
     Increasing net architecture might be successful. Unfortunately danburit is
     having issues, else I would already know.
 
+Params63: (16x16)
+    See further below.
+
 Params64: (16x16)
     May31_06-48-42_euklas.cip.ifi.lmu.de
     Minutes: 3657.1515263160068
@@ -1413,10 +1473,7 @@ Params67: (16x16)
     For an experiment with current best alpha, see params69.
 
 Params68: (16x16)
-    May31_17-10-16_petalit.cip.ifi.lmu.de
-    Crashed: Exploding gradients (?)
-    Restarted.
-    Running (petalit)
+    See further below.
 
 Params69: (16x16)
     May31_17-10-22_zirkon.cip.ifi.lmu.de
@@ -1425,37 +1482,94 @@ Params69: (16x16)
     Worked well, but is it much of an improvement to version without
     scheduling? Warrants some more experiments.
 
-// moved here for visibility
-Params63: (16x16)
-    Crashed - Restarted (danburit
-    Crashed - possibly memory leak.
-        https://pythonspeed.com/articles/python-multiprocessing/
-    Restarted with fix (set_start_method("spawn"))
-    Running (heliodor)
-
+// Don't forget, the below are all horizon=400
 Params70:
-    Running (amazonit)
+    Jun03_22-18-22_amazonit.cip.ifi.lmu.de
+    Minutes: 1540.9452624837556
+    Learnt 1/10. Did not learn 9/10. A few that could be considered nearly
+    learnt.
+    Was finished after just 22h!! So maybe just add more episodes?
 
 Params71:
-    Running (beryll)
+    Jun03_22-18-24_beryll.cip.ifi.lmu.de
+    Minutes: 1955.9187905669212
+    Learnt 3/10. Did not learn 7/10. A few times did not eval a single good
+    path.
+    With increasing train steps it becomes more extreme, which makes sense:
+    We learn more than params70, but often we also don't learn anything at
+    all.
 
 Params72:
-    Running (sodalith)
+    Jun03_22-18-27_sodalith.cip.ifi.lmu.de
+    Minutes: 3162.17279317379
+    Learnt 9/10. Did not learn 1/10. But it was close.
+    When it learns, it becomes stable extremely fast. Pretty good!
 
 Params73:
-    Running (indigiolith)
+    Jun03_22-18-29_indigiolith.cip.ifi.lmu.de
+    Minutes: 3582.519363939762
+    Learnt 9/10. Did not learn 1/10. But it was close.
+    Another good candidate.
 
 Params74:
-    Running (euklas)
+    Jun03_22-18-32_euklas.cip.ifi.lmu.de
+    Minutes: 4058.873200114568
+    Learnt 8/10. Did not learn 2/10.
+    Needs to be redone. Should've set reward_exponent to 1.
 
 Params75:
-    Running (peridot)
+    Jun03_22-18-34_peridot.cip.ifi.lmu.de
+    Minutes: 1437.1275587677956
+    Learnt 7/10. Did not learn 3/10. Some were close.
+    Very fast, and we could do more episodes!
 
 Params76:
     Running (zirkon)
 
 Params77:
-    Running (goshenit)
+    Jun03_22-18-44_goshenit.cip.ifi.lmu.de
+    Minutes: 1817.216767668724
+    Learnt 3/10. Did not learn 7/10.
+    Makes sense, since params71 already had such issues.
+
+// Moved here for visibiility
+Params68: (16x16)
+    May31_17-10-16_petalit.cip.ifi.lmu.de
+    Crashed: Exploding gradients (?)
+    Jun03_22-18-37_petalit.cip.ifi.lmu.de
+    Minutes: ~3960
+    Learnt 8/10. Did not learn 2/10.
+    Amazing result. Apparently without reward exponent (only thing left: the
+    square from prioritized_sampling=True) we still learn quite a lot.
+    But very slow.
+
+// moved here for visibility
+Params63: (16x16)
+    +set_start_method("spawn")
+    Running (heliodor)
+
++Python performance improvements (~2.5x)
+
+Params78:
+    Running (amazonit)
+
+Params79:
+    Running (beryll)
+
+Params80:
+    Running (sodalith)
+
+Params81:
+    Running (indigiolith)
+
+Params82:
+    Running (euklas)
+
+Params83:
+    Running (peridot)
+
+Params84:
+    Running (petalit)
 
 
 CURRENT BEST:
@@ -1463,6 +1577,7 @@ Params41 prio=True
 Params45 prio=False
 Params57 prio=True (8x8, 16x16)
 Params69 prio=True (16x16)
+Params72/73 ?
 
 """
 
