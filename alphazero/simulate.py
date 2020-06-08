@@ -37,7 +37,8 @@ def get_params():
         "net_architecture": [64, 64],
         "schedule_alpha": False,
         "scheduler_class": "ExponentialLR",
-        "scheduler_gamma": .995,
+        "scheduler_args": [.995],
+        "scheduler_kwargs": {},
 
         # AlphaZero
         "memory_capacity": 1000,
@@ -781,7 +782,8 @@ def get_params():
 
     params63 = copy.deepcopy(params57)
     params63.update({
-        "n_procs": 12,
+        # "n_procs": 12,
+        "n_procs": 8,
         "net_architecture": [128, 128, 64, 64]
     })
 
@@ -875,6 +877,7 @@ def get_params():
     params76 = copy.deepcopy(params69)
     params76.update({
         # Includes schedule_alpha=True
+        "n_procs": 8,
         "net_architecture": [128, 128, 64, 64]
     })
 
@@ -913,7 +916,19 @@ def get_params():
     params81.update({
         "n_procs": 8,
         "prioritized_sampling": False,
-        "reward_exponent": 1
+        "reward_exponent": 1,
+
+        # Just for clarity. The params from parent configs.
+        "episodes": 500,
+        "simulations": 50,
+        "n_actors": 30,
+        "train_steps": 3000,
+        "alpha": .001,
+        "schedule_alpha": True,
+        "horizon": 400,  # Keep in mind: maximum actions is 1024!
+        # For 16x16
+        "desired_eval_len": 40,
+        "n_desired_eval_len": 15
     })
 
     params82 = copy.deepcopy(params68)
@@ -939,7 +954,34 @@ def get_params():
         "simulations": 50
     })
 
-    # TODO: merge of params70 and params69?
+    params85 = copy.deepcopy(params81)
+    params85.update({
+        "train_steps": 5000
+    })
+
+    # Sanity check
+    params86 = copy.deepcopy(params81)
+    params86.update({
+        "schedule_alpha": False
+    })
+
+    params87 = copy.deepcopy(params81)
+    params87.update({
+        "scheduler_class": "MultiStepLR",  # AlphaZero uses step too.
+        "scheduler_args": [[200, 400]]
+        # "scheduler_class": "LambdaLR",
+        # "scheduler_args": [lambda x: math.max(.0001, .995 ** x)]
+    })
+
+    params88 = copy.deepcopy(params82)
+    params88.update({
+        "episodes": 500
+    })
+
+    params89 = copy.deepcopy(params83)
+    params89.update({
+        "alpha": .005  # instead of .001
+    })
 
     return {
         "1": params1,
@@ -1028,6 +1070,11 @@ def get_params():
         "82": params82,
         "83": params83,
         "84": params84,
+        "85": params85,
+        "86": params86,
+        "87": params87,
+        "88": params88,
+        "89": params89,
     }
 
 
@@ -1554,30 +1601,66 @@ Params78:
     Running (amazonit)
 
 Params79:
-    Running (beryll)
+    Jun07_05-46-02_beryll.cip.ifi.lmu.de
+    Minutes: 1352.0987024943033
+    Learnt 10/10. !!!!!!!!!!!!!! But one was a very close one (finished at
+    episode 492/500). Fast.
+    I think with 500 episodes learning rate scheduler should have a minimum.
 
 Params80:
     Running (sodalith)
 
 Params81:
-    Running (indigiolith)
+    Jun07_05-46-02_indigiolith.cip.ifi.lmu.de
+    Minutes: 1417.6139293591182
+    Learnt 10/10. !!!!!!!!!!!!! Awesome result. Fast.
+    It's based on 79 (but without prioritized sampling/reward exponent), so
+    again: lr scheduler should have minimum.
 
 Params82:
-    Running (euklas)
+    Jun07_05-46-02_euklas.cip.ifi.lmu.de
+    Minutes: 1187.9134648482004
+    Learnt 7/10. Did not learn 3/10. Extremely fast, but probably due to low
+    episodes. Need to increase.
 
 Params83:
-    Running (peridot)
+    Jun07_05-46-02_peridot.cip.ifi.lmu.de
+    Minutes: 1036.8351935903231 Learned 9/10. Did not learn 1/10. Fast.
+    The one time, it got close but then reverted and did not eval anything
+    good for 300 episodes.
+    -> From what I'm seeing scheduling is too much here. We have 500
+    episodes. Decrease scheduling accordingly. Eg .99 -> .995 or .999
+    Other than that, this seems to be the fastest good one.
 
 Params84:
     Running (petalit)
 
+Params85:
+    Running (beryll)
+
+Params86:
+    Running (indigiolith)
+
+Params87:
+    Running (euklas)
+
+Params88:
+    Running (peridot)
+
+Params89:
+    Running (goshenit)
+
+TODO:
+    Explore more lr schedules
+    Explore more net architectures
 
 CURRENT BEST:
 Params41 prio=True
 Params45 prio=False
 Params57 prio=True (8x8, 16x16)
 Params69 prio=True (16x16)
-Params72/73 ?
+Params79 prio=True (16x16)
+Params81 prio=False (16x16)  // 10/10
 
 """
 

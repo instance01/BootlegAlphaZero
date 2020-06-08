@@ -3,19 +3,19 @@ amazonit:
   params: 78
 beryll:
   game: 16x16
-  params: 79
+  params: 85
 sodalith:
   game: 16x16
   params: 80
 indigiolith:
   game: 16x16
-  params: 81
+  params: 86
 euklas:
   game: 16x16
-  params: 82
+  params: 87
 peridot:
   game: 16x16
-  params: 83
+  params: 88
 petalit:
   game: 16x16
   params: 84
@@ -27,4 +27,4 @@ heliodor:
   params: 63
 goshenit:
   game: 16x16
-  params: 0
+  params: 89

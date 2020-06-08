@@ -60,7 +60,9 @@ class A2CLearner:
                 'torch.optim.lr_scheduler.%s' % params["scheduler_class"]
             )
             self.scheduler = scheduler(
-                self.policy_optimizer, params["scheduler_gamma"]
+                self.policy_optimizer,
+                *params["scheduler_args"],
+                **params["scheduler_kwargs"]
             )
 
     def policy(self, state):
