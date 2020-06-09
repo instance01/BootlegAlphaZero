@@ -28,7 +28,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 add_definitions("-lstdc++fs")
 set(CMAKE_BUILD_TYPE Debug)
 
-add_executable(${PROJECT_NAME} alphazero.cpp a2c.cpp replay_buffer.cpp env.cpp test_all.cpp tensorboard_util.cpp simple_thread_pool.cpp mcts.cpp)
+add_executable(${PROJECT_NAME} alphazero.cpp a2c.cpp replay_buffer.cpp env.cpp mcts.cpp test_all.cpp tensorboard_util.cpp simple_thread_pool.cpp)
 target_link_libraries(${PROJECT_NAME} "${TORCH_LIBRARIES}")
 target_link_libraries(${PROJECT_NAME} "${PYTHON_LIBRARIES}")
 target_link_libraries(${PROJECT_NAME} "stdc++fs")

@@ -7,6 +7,7 @@
 #include "a2c.hpp"
 #include "alphazero.hpp"
 #include "simple_thread_pool.hpp"
+#include "mcts.hpp"
 
 
 std::tuple<Params, Env, MCTS, A2CLearner> setup_all() {
@@ -16,10 +17,15 @@ std::tuple<Params, Env, MCTS, A2CLearner> setup_all() {
   params["net_architecture"] = std::vector<int>{64, 64};
   params["alpha"] = 0.01;
   params["reward_exponent"] = 1;
+  params["dirichlet_alpha"] = 0.1;
+  params["dirichlet_frac"] = 0.25;
+  params["pb_c_base"] = 500.0;
+  params["pb_c_init"] = 0.1;
+  params["simulations"] = 10;
   Env env = Env();
   env.init("5x5", params);
   auto a2c_agent = A2CLearner(params);
-  auto mcts_agent = MCTS();
+  auto mcts_agent = MCTS(env, a2c_agent, params);
   return std::make_tuple(params, env, mcts_agent, a2c_agent);
 }
 
@@ -107,6 +113,19 @@ void test_thread_pool() {
   env.cleanup();
 }
 
+void test_mcts() {
+  Params params;
+  Env env;
+  A2CLearner a2c_agent;
+  MCTS mcts_agent;
+  std::tie(params, env, mcts_agent, a2c_agent) = setup_all();
+
+  std::vector<double> obs = env.reset();
+
+  std::vector<double> probs = mcts_agent.policy(env, obs);
+  std::cout << probs[0] << " " << probs[1] << " " << probs[2] << std::endl;
+}
+
 void test_all() {
   test_a2c();
   test_replay_buffer();
@@ -114,6 +133,7 @@ void test_all() {
   test_env_evaluate();
   // test_tensorboard_logger();
   test_thread_pool();
+  test_mcts();
 
   py_finalize();
 }
