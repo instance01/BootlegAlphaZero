@@ -926,6 +926,10 @@ def get_params():
         "alpha": .001,
         "schedule_alpha": True,
         "horizon": 400,  # Keep in mind: maximum actions is 1024!
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 19000,
+        "pb_c_init": .3,
         # For 16x16
         "desired_eval_len": 40,
         "n_desired_eval_len": 15
@@ -973,14 +977,61 @@ def get_params():
         # "scheduler_args": [lambda x: math.max(.0001, .995 ** x)]
     })
 
+    # This is an alternative to params81 that also works.
     params88 = copy.deepcopy(params82)
     params88.update({
-        "episodes": 500
+        "episodes": 500,
+
+        # Just for clarity. The params from parent configs.
+        "reward_exponent": 1,
+        "train_steps": 8000,
+        "horizon": 400,
+        "alpha": .001,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "pb_c_base": 19000,
+        "pb_c_init": .3,
+        # For 16x16
+        "desired_eval_len": 40,
+        "n_desired_eval_len": 15,
     })
 
     params89 = copy.deepcopy(params83)
     params89.update({
         "alpha": .005  # instead of .001
+    })
+
+    params90 = copy.deepcopy(params84)
+    params90.update({
+        "episodes": 500
+    })
+
+    params91 = copy.deepcopy(params81)
+    params91.update({
+        # More randomness
+        "dirichlet_alpha": .4,
+        "dirichlet_frac": .5,
+        "pb_c_init": .2,
+    })
+
+    # 88 has more actors and train steps
+    params92 = copy.deepcopy(params88)
+    params92.update({
+        # More randomness
+        "dirichlet_alpha": .4,
+        "dirichlet_frac": .5,
+        "pb_c_init": .2,
+        "n_actors": 70  # 50 -> 70
+    })
+
+    params93 = copy.deepcopy(params92)
+    params93.update({
+        "alpha": 0.005  # Was: 0.001
+    })
+
+    params94 = copy.deepcopy(params92)
+    params94.update({
+        "alpha": 0.0002  # Was: 0.001
     })
 
     return {
@@ -1075,6 +1126,11 @@ def get_params():
         "87": params87,
         "88": params88,
         "89": params89,
+        "90": params90,
+        "91": params91,
+        "92": params92,
+        "93": params93,
+        "94": params94,
     }
 
 
@@ -1608,7 +1664,9 @@ Params79:
     I think with 500 episodes learning rate scheduler should have a minimum.
 
 Params80:
-    Running (sodalith)
+    Jun07_05-46-02_sodalith.cip.ifi.lmu.de
+    Minutes: 4046.197966166337
+    Learnt 8/10. Did not learn 2/10.
 
 Params81:
     Jun07_05-46-02_indigiolith.cip.ifi.lmu.de
@@ -1633,26 +1691,67 @@ Params83:
     Other than that, this seems to be the fastest good one.
 
 Params84:
-    Running (petalit)
+    Jun07_05-46-02_petalit.cip.ifi.lmu.de
+    Minutes: 2271.3330056786535
+    Learnt 9/10. Did not learn 1/10. Rather close. The 9 times it was mostly
+    very fast, i.e. <100 episodes and done. Adding episodes=300 or so would
+    make this one a 10/10.
 
 Params85:
-    Running (beryll)
+    Jun08_12-24-56_beryll.cip.ifi.lmu.de
+    Minutes: 2312.261377151807
+    Learnt 10/10. However often rather slow (>300 episodes).
+    Not a good candidate.
 
 Params86:
-    Running (indigiolith)
+    Jun08_12-25-14_indigiolith.cip.ifi.lmu.de
+    Minutes: 1805.1473118782044
+    Learnt 8/10. Did not learn 2/10. Should be 3/10 because one was learnt very
+    close. It seems not scheduling alpha is not so good, we have three cases
+    with nearly or equal 500 episodes in this one.
 
 Params87:
-    Running (euklas)
+    Jun08_12-25-00_euklas.cip.ifi.lmu.de
+    Minutes: 1096.2937799533208
+    Learnt 9/10. Did not learn 1/10. MultiStep is probably not fit correctly.
 
 Params88:
-    Running (peridot)
+    Jun08_12-25-03_peridot.cip.ifi.lmu.de
+    Minutes: 1171.3968317349752
+    Learnt 10/10. Good alternative to params81.
 
 Params89:
+    Jun08_12-25-11_goshenit.cip.ifi.lmu.de
+    Minutes: 2203.914812485377
+    Learnt 10/10. Needs many episodes, rather slow.
+    High lr (alpha) and aggressive scheduling (.99) leads to slowness.
+
+Params81_again:
+    just a sanity check whether it's really that fast.
+    Running (beryll)
+
+Params90:  # 84 but with 500 episodes
+    Running (sodalith)
+
+Params81_MTCAR:
+    Running (indigiolith)
+
+Params91: (MTCAR)
+    Running (euklas)
+
+Params92:
+    Running (peridot)
+
+Params93:
+    Running (petalit)
+
+Params94:
     Running (goshenit)
 
 TODO:
     Explore more lr schedules
     Explore more net architectures
+    87 explore MultiStep some more
 
 CURRENT BEST:
 Params41 prio=True
@@ -1661,6 +1760,7 @@ Params57 prio=True (8x8, 16x16)
 Params69 prio=True (16x16)
 Params79 prio=True (16x16)
 Params81 prio=False (16x16)  // 10/10
+Params88 prio=False (16x16)  // 10/10, alternative to 81
 
 """
 
@@ -1763,6 +1863,47 @@ def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
     print("Minutes:", (time.time() - start_time) / 60.)
 
 
+class EnvWrapperMtCar:
+    def __init__(self, env, params):
+        self.env = env
+        self.params = params
+        self.actions = env.actions
+
+    def step(self, action):
+        obs, reward, done, _ = self.env.step(action)
+        reward **= self.params["reward_exponent"]
+        return obs[0], reward, done, None
+
+    def reset(self):
+        obs = self.env.reset()
+        return obs[0]
+
+
+def simulate_many_mtcar(game, key, n_runs=10):
+    env = gym.make('MountainCar-v0')
+    env.actions = [0, 1, 2]
+
+    start_time = time.time()
+
+    # Load params and run AlphaZero.
+    params = get_params()[key]
+    params["game"] = game
+    params["key"] = key
+    params["n_actions"] = 3
+    params["n_input_features"] = 2
+    params["env"] = EnvWrapperMtCar(env, params)
+
+    writer = SummaryWriter()
+    for i in range(n_runs):
+        episodes, last_eval_len, last_tot_reward = alphazero.run(
+            env, params, i, writer
+        )
+        writer.add_scalar('Summary/Length_All', last_eval_len, i)
+        writer.add_scalar('Summary/Episodes_All', episodes, i)
+        writer.add_scalar('Summary/Rewards_All', last_tot_reward, i)
+    print("Minutes:", (time.time() - start_time) / 60.)
+
+
 if __name__ == '__main__':
     set_start_method("spawn")
 
@@ -1774,7 +1915,8 @@ if __name__ == '__main__':
         '5x5_pomdp': (
             functools.partial(simulate_many_minigrid, pomdp=True),
             '5x5'
-        )
+        ),
+        'mtcar': (simulate_many_mtcar,)
     }
     game = sys.argv[1]
     key = sys.argv[2]
