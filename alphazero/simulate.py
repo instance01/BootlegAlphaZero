@@ -1034,6 +1034,41 @@ def get_params():
         "alpha": 0.0002  # Was: 0.001
     })
 
+    params95 = copy.deepcopy(params92)
+    params95.update({
+        "alpha": 0.01  # Was: 0.001
+    })
+
+    # Still, let's try same 4 as above but with 81 as base.
+    params96 = copy.deepcopy(params88)
+    params96.update({
+        # More randomness
+        "dirichlet_alpha": .4,
+        "dirichlet_frac": .5,
+        "pb_c_init": .2,
+        "n_actors": 50  # 30 -> 50
+    })
+
+    params97 = copy.deepcopy(params96)
+    params97.update({
+        "alpha": 0.005  # Was: 0.001
+    })
+
+    params98 = copy.deepcopy(params96)
+    params98.update({
+        "alpha": 0.0002  # Was: 0.001
+    })
+
+    params99 = copy.deepcopy(params96)
+    params99.update({
+        "alpha": 0.01  # Was: 0.001
+    })
+
+    params100 = copy.deepcopy(params96)
+    params100.update({
+        "n_actors": 20  # 30 -> 20
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -1131,6 +1166,12 @@ def get_params():
         "92": params92,
         "93": params93,
         "94": params94,
+        "95": params95,
+        "96": params96,
+        "97": params97,
+        "98": params98,
+        "99": params99,
+        "100": params100,
     }
 
 
@@ -1153,7 +1194,6 @@ Params1:
 
 Params2:
     Crashed, gradient explosion
-    Running (restarted)
 
 Params3:
     [7, 8, 7, 8, 3, 3, 6, 1, 1, 0]
@@ -1161,7 +1201,6 @@ Params3:
 
 Params4:
     Crashed, gradient explosion
-    Running (restarted)
     +multiprocessing
     Crashed again, gradient explosion
 
@@ -1332,18 +1371,17 @@ Params19_again:
 Params19_again: // just to test summary tensorboard (justatest)
     -8x8
     -Exponentiate rewards with 8
-    Running
     May18_22-36-39_sodalith.cip.ifi.lmu.de
 
 Params28_again:
-    Running
+    Nothing
 
 Params32:
     +Refactored reward_exponent, game and key
-    Running
+    Nothing
 
 Params33:
-    Running
+    Nothing
 
 Params34:
     May19_17-28-02_amazonit.cip.ifi.lmu.de
@@ -1654,7 +1692,10 @@ Params63: (16x16)
 +Python performance improvements (~2.5x)
 
 Params78:
-    Running (amazonit)
+    Killed at the end.
+    Jun07_05-46-02_amazonit.cip.ifi.lmu.de
+    Minutes: ~4380
+    Learnt 8/9. Did not learn 1/9. Last one wasn't doing that well either.
 
 Params79:
     Jun07_05-46-02_beryll.cip.ifi.lmu.de
@@ -1730,13 +1771,15 @@ Params81_again:
     just a sanity check whether it's really that fast.
     Running (beryll)
 
-Params90:  # 84 but with 500 episodes
+Params90:  // 84 but with 500 episodes
     Running (sodalith)
 
 Params81_MTCAR:
     Running (indigiolith)
 
-Params91: (MTCAR)
+// From now on, MTCAR.
+
+Params91:
     Running (euklas)
 
 Params92:
@@ -1747,6 +1790,24 @@ Params93:
 
 Params94:
     Running (goshenit)
+
+Params95:
+    Running (amazonit)
+
+Params96:
+    Running
+
+Params97:
+    Running
+
+Params98:
+    Running
+
+Params99:
+    Running
+
+Params100:
+    Running
 
 TODO:
     Explore more lr schedules
@@ -1852,7 +1913,7 @@ def simulate_many_minigrid(game, key, pomdp=False, n_runs=10):
     env = prepare_minigrid(game, params, pomdp)
     params["env"] = env
 
-    writer = SummaryWriter()
+    writer = SummaryWriter(comment="-%s.%s" % (game, key))
     for i in range(n_runs):
         episodes, last_eval_len, last_tot_reward = alphazero.run(
             env, params, i, writer
@@ -1893,7 +1954,7 @@ def simulate_many_mtcar(game, key, n_runs=10):
     params["n_input_features"] = 2
     params["env"] = EnvWrapperMtCar(env, params)
 
-    writer = SummaryWriter()
+    writer = SummaryWriter(comment="-%s.%s" % (game, key))
     for i in range(n_runs):
         episodes, last_eval_len, last_tot_reward = alphazero.run(
             env, params, i, writer
