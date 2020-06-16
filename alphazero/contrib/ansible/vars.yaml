@@ -1,24 +1,24 @@
 amazonit:
-  game: 16x16
-  params: 78
+  game: mtcar
+  params: 95
 beryll:
   game: 16x16
-  params: 85
+  params: 81
 sodalith:
   game: 16x16
-  params: 80
+  params: 90
 indigiolith:
-  game: 16x16
-  params: 86
+  game: mtcar
+  params: 81
 euklas:
-  game: 16x16
-  params: 87
+  game: mtcar
+  params: 91
 peridot:
-  game: 16x16
-  params: 88
+  game: mtcar
+  params: 92
 petalit:
-  game: 16x16
-  params: 84
+  game: mtcar
+  params: 93
 zirkon:
   game: 16x16
   params: 76
@@ -26,5 +26,5 @@ heliodor:
   game: 16x16
   params: 63
 goshenit:
-  game: 16x16
-  params: 89
+  game: mtcar
+  params: 94

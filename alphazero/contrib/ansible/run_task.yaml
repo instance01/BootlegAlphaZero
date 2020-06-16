@@ -3,6 +3,8 @@
     ansible_python_interpreter: /usr/bin/python3
     game: '{{ localvars[vars["play_hosts"][0]]["game"] }}'
     params: '{{ localvars[vars["play_hosts"][0]]["params"] }}'
-  shell: (screen -dmS {{ params }} bash -c 'source PY3ENV/bin/activate && cd GRAB0/v2 && python3 simulate.py {{ game }} {{ params }}; exec bash' 2>&1 &) && sleep 2
+  #shell: (screen -dmS {{ params }} bash -c 'source PY3ENV/bin/activate && cd GRAB0/v2 && python3 simulate.py {{ game }} {{ params }}; exec bash' 2>&1 &) && sleep 2
+  shell: (screen -dmS {{ params }} bash -c 'source PY3ENV/bin/activate && cd GRAB0/v2 && srun -p All -c 6 python3 simulate.py {{ game }} {{ params }}; exec bash' 2>&1 &) && sleep 2
   async: 5
   poll: 0
+
