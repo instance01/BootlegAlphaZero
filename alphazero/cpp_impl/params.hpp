@@ -5,5 +5,5 @@
 #include <variant>
 #include <vector>
 
-using Params = std::map<std::string, std::variant<double, std::string, std::vector<int>, int>>;
+using Params = std::map<std::string, std::variant<double, std::string, std::vector<int>, int, bool>>;
 #endif
