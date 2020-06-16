@@ -4,24 +4,26 @@
 #include <variant>
 #include <vector>
 #include <map>
-#include "Python.h"
+#include <mutex>
+#include <memory>
+
+#include "envs/gridworld.hpp"
+#include "cfg.hpp"
+
 
 class Env {
   public:
-    PyObject* envModule;
-    PyObject* env;
+    GridWorldEnv grid_world;
+
+    int reward_exponent;
 
     Env(){};
     ~Env(){};
 
-    void init(
-        std::string game,
-        std::map<std::string, std::variant<double, std::string, std::vector<int>, int>> params);
-    std::tuple<std::vector<double>, double, bool> step(int action);
-    std::vector<double> reset();
-    void cleanup();
+    void init(std::string game, json params);
+
+    std::tuple<std::vector<int>, double, bool> step(int action);
+    std::vector<int> reset();
     std::unique_ptr<Env> clone();
 };
-
-void py_finalize();
 #endif
