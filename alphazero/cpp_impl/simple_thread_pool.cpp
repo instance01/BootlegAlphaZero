@@ -53,14 +53,13 @@ void SimpleThreadPool::add_task(Task *task) {
     std::unique_lock<std::mutex> lock(queue_mutex);
     task_queue.emplace(task);
     tasks.push_back(task);
-    semaphore->count += 1;
   }
 
   pool_notifier.notify_one();
 }
 
 std::vector<std::shared_ptr<Game>> SimpleThreadPool::join() {
-  for (int i = 0; i < semaphore->count; ++i) {
+  for (int i = 0; i < tasks.size(); ++i) {
     semaphore->wait();
   }
 
@@ -88,11 +87,11 @@ void SimpleThreadPool::worker() {
 
       task = task_queue.front();
       task_queue.pop();
-      semaphore->notify();
     }
 
     std::shared_ptr<Game> result = task->func();
     task->result = result;
     task->finished = true;
+    semaphore->notify();
   }
 }
