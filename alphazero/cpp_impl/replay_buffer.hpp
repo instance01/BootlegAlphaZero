@@ -1,14 +1,19 @@
 #ifndef REPLAY_BUFFER_HEADER
 #define REPLAY_BUFFER_HEADER
+#include <deque>
+#include <memory>
+#include <random>
+#include "cfg.hpp"
 #include "game.hpp"
 
 class ReplayBuffer {
   public:
-    std::vector<Game> buffer;
+    std::deque<std::shared_ptr<Game>> buffer;
     int window_size;
     bool prioritized_sampling = true;
+    std::mt19937 generator;
 
-    ReplayBuffer() {};
+    //ReplayBuffer();
     ~ReplayBuffer() {};
 
     ReplayBuffer(
@@ -16,12 +21,15 @@ class ReplayBuffer {
     ) : window_size(window_size), prioritized_sampling(prioritized_sampling) {};
 
 
+    int _uniform();
+    int _prioritized(std::vector<double> rewards);
     void add(
-        std::vector<std::vector<double>> states,
+        std::vector<std::vector<int>> states,
         std::vector<double> rewards,
         std::vector<std::vector<double>> mcts_actions
     );
+    void add(std::shared_ptr<Game> game);
     std::vector<double> get_rewards();
-    Game sample();
+    std::shared_ptr<Game> sample();
 };
 #endif
