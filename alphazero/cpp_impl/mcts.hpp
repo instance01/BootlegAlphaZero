@@ -6,7 +6,7 @@
 #include <torch/torch.h>
 #include "env.hpp"
 #include "a2c.hpp"
-#include "params.hpp"
+#include "cfg.hpp"
 
 
 class Node {
@@ -15,12 +15,13 @@ class Node {
     bool is_fully_expanded = false;
     bool is_terminal = false;
     double reward = 0.;
-    std::shared_ptr<Node> parent = nullptr;
+    std::weak_ptr<Node> parent;
     std::vector<std::shared_ptr<Node>> children;
     int action;
     double Q = 0.;
     int visits = 0;
-    std::vector<double> state;
+    std::vector<int> state;
+    torch::Tensor torch_state;
     std::shared_ptr<Env> env;
 
     // TODO Increase that?
@@ -34,16 +35,16 @@ class Node {
 
 class MCTS {
   public:
-    Params params;
+    json params;
     A2CLearner a2c_agent;
-    // shared_ptr because shared_ptr makes this class uncopyable.
+    // shared_ptr because unique_ptr makes this class uncopyable.
     // And I don't want to define a custom copy function.
     std::shared_ptr<Env> env;
     std::shared_ptr<Node> root_node;
 
-    std::map<std::vector<double>, torch::Tensor> policy_net_cache;
+    std::map<std::vector<int>, torch::Tensor> policy_net_cache;
 
-    MCTS(Env env, A2CLearner a2c_agent, Params params);
+    MCTS(Env env, A2CLearner a2c_agent, json params);
     MCTS() {};
     ~MCTS() {};
 
@@ -54,6 +55,6 @@ class MCTS {
     std::shared_ptr<Node> select_expand();
     void backup(std::shared_ptr<Node> curr_node, double Q_val);
     void reset_policy_cache();
-    std::vector<double> policy(Env env, std::vector<double> obs, bool ret_node=false);
+    std::vector<double> policy(Env env, std::vector<int> obs, bool ret_node=false);
 };
 #endif

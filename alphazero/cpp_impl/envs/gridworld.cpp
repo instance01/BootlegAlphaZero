@@ -1,4 +1,5 @@
 #include "gridworld.hpp"
+#include <cmath>
 #include <utility>
 #include <tuple>
 #include <iostream>
@@ -9,6 +10,10 @@ GridWorldEnv::GridWorldEnv(
 ) : width(width), height(height), blocks(blocks) {
   max_steps = width * height * 4;
   reset();
+
+  expected_mean = {(width - 1) / 2., (height - 1) / 2., .75};
+  // std dev of uniform distribution:
+  expected_stddev = {width / std::sqrt(12), height / std::sqrt(12), 4. / std::sqrt(12)};
 }
 
 void

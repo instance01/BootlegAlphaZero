@@ -19,6 +19,10 @@ class GridWorldEnv {
     int max_steps;
     int steps;
 
+    // For A2C. Just needs to be rough.
+    std::vector<float> expected_mean;
+    std::vector<float> expected_stddev;
+
     // Due to predictably small size no need for hashing (unordered_set)
     std::set<std::pair<int, int>> blocks;
 

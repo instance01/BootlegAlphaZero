@@ -16,9 +16,7 @@ class ReplayBuffer {
     //ReplayBuffer();
     ~ReplayBuffer() {};
 
-    ReplayBuffer(
-        int window_size, bool prioritized_sampling = true
-    ) : window_size(window_size), prioritized_sampling(prioritized_sampling) {};
+    ReplayBuffer(int window_size, bool prioritized_sampling=false);
 
 
     int _uniform();
