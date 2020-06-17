@@ -1,0 +1,22 @@
+{
+    "81": {
+        "n_procs": 8,
+        "prioritized_sampling": false,
+        "reward_exponent": 2,
+
+        "episodes": 500,
+        "simulations": 50,
+        "n_actors": 30,
+        "train_steps": 3000,
+        "alpha": 0.001,
+        "schedule_alpha": true,
+        "horizon": 400,
+        "dirichlet_alpha": 0.3,
+        "dirichlet_frac": 0.5,
+        "pb_c_base": 19000,
+        "pb_c_init": 0.3,
+
+        "desired_eval_len": 40,
+        "n_desired_eval_len": 15
+    }
+}
