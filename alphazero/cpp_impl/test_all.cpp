@@ -21,9 +21,14 @@ std::tuple<Params, Env, MCTS, A2CLearner> setup_all() {
   params["dirichlet_frac"] = 0.25;
   params["pb_c_base"] = 500.0;
   params["pb_c_init"] = 0.1;
-  params["simulations"] = 10;
+  params["simulations"] = 50;
+  params["horizon"] = 1024;
+  params["memory_capacity"] = 1000;
+  params["prioritized_sampling"] = false;
   Env env = Env();
-  env.init("5x5", params);
+  // TODO
+  // env.init("5x5", params);
+  env.init("16x16", params);
   auto a2c_agent = A2CLearner(params);
   auto mcts_agent = MCTS(env, a2c_agent, params);
   return std::make_tuple(params, env, mcts_agent, a2c_agent);
@@ -42,7 +47,7 @@ void test_a2c() {
   std::tie(policy, value) = a2c_agent.predict_policy({{1, 2, 3}});
   std::cout << policy.detach() << " " << value.detach() << std::endl;
 
-  env.cleanup();
+  //env.cleanup();
 }
 
 void test_replay_buffer() {
@@ -50,7 +55,7 @@ void test_replay_buffer() {
   replay_buffer.add({{0, 0}, {1, 1}}, {0, 95}, {{0, 1, 0}, {1, 0, 0}});
   replay_buffer.add({{2, 2}, {3, 3}}, {0, 91}, {{0, 1, 0}, {1, 0, 0}});
   replay_buffer.add({{4, 4}, {5, 5}}, {0, 0}, {{0, 1, 0}, {1, 0, 0}});
-  Game game = replay_buffer.sample();
+  std::shared_ptr<Game> game = replay_buffer.sample();
   game = replay_buffer.sample();
   game = replay_buffer.sample();
   game = replay_buffer.sample();
@@ -63,7 +68,7 @@ void test_env_evaluate() {
   MCTS mcts_agent;
   std::tie(params, env, mcts_agent, a2c_agent) = setup_all();
 
-  std::vector<double> obs = env.reset();
+  std::vector<int> obs = env.reset();
   std::cout << obs[0] << " " << obs[1] << " " << obs[2] << std::endl;
 
   double reward;
@@ -97,20 +102,23 @@ void test_thread_pool() {
   MCTS mcts_agent;
   std::tie(params, env, mcts_agent, a2c_agent) = setup_all();
 
-  auto pool = SimpleThreadPool(2);
+  //PyThreadState* thread_state = PyEval_SaveThread();
+  auto pool = SimpleThreadPool(1);
   auto lambda = [env, params, mcts_agent, a2c_agent]() -> std::shared_ptr<Game> {
     return run_actor(env, params, mcts_agent, a2c_agent);
   };
   Task *task = new Task(lambda);
-  Task *task2 = new Task(lambda);
-  Task *task3 = new Task(lambda);
+  // Task *task2 = new Task(lambda);
+  // Task *task3 = new Task(lambda);
   pool.add_task(task);
-  pool.add_task(task2);
-  pool.add_task(task3);
+  // pool.add_task(task2);
+  // pool.add_task(task3);
   std::vector<std::shared_ptr<Game>> games = pool.join();
   std::cout << "# Games: " << games.size() << std::endl;
 
-  env.cleanup();
+  //PyEval_RestoreThread(thread_state);
+
+  //env.cleanup();
 }
 
 void test_mcts() {
@@ -120,20 +128,34 @@ void test_mcts() {
   MCTS mcts_agent;
   std::tie(params, env, mcts_agent, a2c_agent) = setup_all();
 
-  std::vector<double> obs = env.reset();
+  std::vector<int> obs = env.reset();
 
   std::vector<double> probs = mcts_agent.policy(env, obs);
   std::cout << probs[0] << " " << probs[1] << " " << probs[2] << std::endl;
 }
 
-void test_all() {
-  test_a2c();
-  test_replay_buffer();
-  test_env_evaluate();
-  test_env_evaluate();
-  // test_tensorboard_logger();
-  test_thread_pool();
-  test_mcts();
+void test_run_actor() {
+  Params params;
+  Env env;
+  A2CLearner a2c_agent;
+  MCTS mcts_agent;
+  std::tie(params, env, mcts_agent, a2c_agent) = setup_all();
 
-  py_finalize();
+  //PyThreadState* thread_state = PyEval_SaveThread();
+  run_actor(env, params, mcts_agent, a2c_agent);
+  //PyEval_RestoreThread(thread_state);
+
+  //env.cleanup();
+}
+
+void test_all() {
+  // test_a2c();
+  // test_replay_buffer();
+  // test_env_evaluate();
+  // test_env_evaluate();
+  // test_tensorboard_logger();
+  //test_thread_pool();
+  test_run_actor();
+  // test_mcts();
+  //py_finalize();
 }
