@@ -6,6 +6,7 @@ find_program(MAKE_EXE NAMES gmake nmake make)
 ExternalProject_Add(tensorboard_logger
   PREFIX            dist/
   GIT_REPOSITORY    https://github.com/Instance-contrib/tensorboard_logger.git
+  GIT_TAG           convenience
   CONFIGURE_COMMAND ""
   BUILD_IN_SOURCE   1
   INSTALL_COMMAND   ""
