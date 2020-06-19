@@ -9,6 +9,7 @@ json get_default() {
   json params1 = {
     {"n_actions", 3},
     {"n_input_features", 3},
+    {"n_runs", 10},
 
     // MCTS
     {"gamma", .99},
@@ -22,14 +23,15 @@ json get_default() {
     // getting to 100 at max) visits don't matter.. At base=50}, hell yes !
     {"pb_c_base", 50},
     {"pb_c_init", 1.25},
+    {"tough_ce", false},
 
     // A2C
     {"alpha", .01},
     {"net_architecture", {64, 64}},
     {"schedule_alpha", false},
-    {"scheduler_class", "ExponentialLR"},
-    {"scheduler_args", {.995}},
-    {"scheduler_kwargs", {}},
+    {"scheduler_class", "exp"},  // exp, step
+    {"scheduler_factor", .995},
+    {"scheduler_steps", {100, 200}},
 
     // AlphaZero
     {"memory_capacity", 1000},

@@ -15,7 +15,7 @@ ReplayBuffer::ReplayBuffer(int window_size, bool prioritized_sampling)
 
 void
 ReplayBuffer::add(
-    std::vector<std::vector<int>> states,
+    std::vector<std::vector<float>> states,
     std::vector<double> rewards,
     std::vector<std::vector<double>> mcts_actions
 ) {

@@ -14,7 +14,7 @@
 
 #include "game.hpp"
 #include "cfg.hpp"
-#include "env.hpp"
+#include "env_wrapper.hpp"
 
 
 struct A2CNetImpl : public torch::nn::Cloneable<A2CNetImpl> {
@@ -47,12 +47,12 @@ class A2CLearner {
     std::shared_ptr<torch::optim::Adam> policy_optimizer;
 
     A2CLearner() {};
-    A2CLearner(json params, Env &env);
+    A2CLearner(json params, EnvWrapper &env);
     ~A2CLearner() {};
 
     torch::Tensor normalize(torch::Tensor x);
     std::pair<torch::Tensor, torch::Tensor> predict_policy(torch::Tensor samples_);
-    std::pair<torch::Tensor, torch::Tensor> predict_policy(std::vector<std::vector<int>> states);
+    std::pair<torch::Tensor, torch::Tensor> predict_policy(std::vector<std::vector<float>> states);
     torch::Tensor _calc_normalized_rewards(std::vector<double> rewards);
     torch::Tensor update(std::shared_ptr<Game> game);
 };

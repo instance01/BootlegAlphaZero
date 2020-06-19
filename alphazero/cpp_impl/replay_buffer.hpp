@@ -13,7 +13,6 @@ class ReplayBuffer {
     bool prioritized_sampling = true;
     std::mt19937 generator;
 
-    //ReplayBuffer();
     ~ReplayBuffer() {};
 
     ReplayBuffer(int window_size, bool prioritized_sampling=false);
@@ -22,7 +21,7 @@ class ReplayBuffer {
     int _uniform();
     int _prioritized(std::vector<double> rewards);
     void add(
-        std::vector<std::vector<int>> states,
+        std::vector<std::vector<float>> states,
         std::vector<double> rewards,
         std::vector<std::vector<double>> mcts_actions
     );

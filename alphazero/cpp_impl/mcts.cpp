@@ -5,7 +5,7 @@
 #include "util.hpp"
 
 
-MCTS::MCTS(Env env, A2CLearner a2c_agent, json params) : params(params), a2c_agent(a2c_agent) {
+MCTS::MCTS(EnvWrapper env, A2CLearner a2c_agent, json params) : params(params), a2c_agent(a2c_agent) {
   auto obs = env.reset();
   this->env = std::move(env.clone());
 
@@ -33,7 +33,7 @@ MCTS::_gen_children_nodes(std::shared_ptr<Node> parent_node) {
   for (int i = 0; i < n_actions; ++i) {
     auto env = this->env->clone();
 
-    std::vector<int> obs;
+    std::vector<float> obs;
     double reward;
     bool done;
     std::tie(obs, reward, done) = env->step(i);
@@ -46,7 +46,7 @@ MCTS::_gen_children_nodes(std::shared_ptr<Node> parent_node) {
     node->is_terminal = done;
     node->parent = std::weak_ptr(parent_node);
 
-    node->torch_state = vec_1d_as_tensor(node->state, torch::kInt);
+    node->torch_state = vec_1d_as_tensor(node->state, torch::kFloat32);
 
     parent_node->children.push_back(node);
   }
@@ -71,15 +71,11 @@ std::shared_ptr<Node>
 MCTS::_get_best_node(std::shared_ptr<Node> parent_node) {
   // TODO Test whether prediction (forwards) need to be really cached.
   // In Python they do, since it's so slow.
-  //
-  // Hashing of a vector<double> is not trivial.
-  // I opted for a red-black tree (map) for now.
-  // TODO: Reconsider.
-  auto cached_action_probs = policy_net_cache.find(parent_node->state);
+  auto cached_action_probs = policy_net_cache.find(parent_node);
   torch::Tensor action_probs;
   if (cached_action_probs == policy_net_cache.end()) {
     std::tie(action_probs, std::ignore) = a2c_agent.predict_policy(parent_node->torch_state);
-    policy_net_cache[parent_node->state] = action_probs;
+    policy_net_cache[parent_node] = action_probs;
   } else {
     action_probs = cached_action_probs->second;
   }
@@ -147,7 +143,7 @@ MCTS::reset_policy_cache() {
 }
 
 std::vector<double>
-MCTS::policy(Env env, std::vector<int> obs, bool ret_node) {
+MCTS::policy(EnvWrapper env, std::vector<float> obs, bool ret_node) {
   int n_actions = params["n_actions"];
   int n_iter = params["simulations"];
 
@@ -156,7 +152,7 @@ MCTS::policy(Env env, std::vector<int> obs, bool ret_node) {
   root_node->env = std::move(env.clone());
   root_node->state = obs;
 
-  root_node->torch_state = vec_1d_as_tensor(root_node->state, torch::kInt);
+  root_node->torch_state = vec_1d_as_tensor(root_node->state, torch::kFloat32);
 
   torch::Tensor action_probs;
   std::tie(action_probs, std::ignore) = a2c_agent.predict_policy(root_node->torch_state);
@@ -171,7 +167,7 @@ MCTS::policy(Env env, std::vector<int> obs, bool ret_node) {
     action_probs[0][i] = action_probs[0][i] * (1 - frac) + noise * frac;
   }
 
-  policy_net_cache[root_node->state] = action_probs;
+  policy_net_cache[root_node] = action_probs;
 
   for (int i = 0; i < n_iter; ++i) {
     std::shared_ptr<Node> node = select_expand();

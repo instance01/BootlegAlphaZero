@@ -61,7 +61,7 @@ A2CNetImpl::forward(torch::Tensor input) {
   return std::make_pair(policy, value);
 }
 
-A2CLearner::A2CLearner(json params, Env &env) : params(params) {
+A2CLearner::A2CLearner(json params, EnvWrapper &env) : params(params) {
   policy_net = A2CNet(
     params["n_input_features"],
     params["n_actions"],
@@ -76,13 +76,13 @@ A2CLearner::A2CLearner(json params, Env &env) : params(params) {
   );
 
   expected_mean_tensor = torch::from_blob(
-      env.grid_world.expected_mean.data(),
-      {env.grid_world.expected_mean.size()},
+      env.env->expected_mean.data(),
+      {env.env->expected_mean.size()},
       torch::TensorOptions().dtype(torch::kFloat32)
   );
   expected_stddev_tensor = torch::from_blob(
-      env.grid_world.expected_stddev.data(),
-      {env.grid_world.expected_stddev.size()},
+      env.env->expected_stddev.data(),
+      {env.env->expected_stddev.size()},
       torch::TensorOptions().dtype(torch::kFloat32)
   );
 }
@@ -129,7 +129,7 @@ A2CLearner::predict_policy(torch::Tensor samples_) {
 }
 
 std::pair<torch::Tensor, torch::Tensor>
-A2CLearner::predict_policy(std::vector<std::vector<int>> states) {
+A2CLearner::predict_policy(std::vector<std::vector<float>> states) {
   auto flattened_states = flatten_as_float(states);
   auto samples_tensor = vec_2d_as_tensor(
       flattened_states, torch::kFloat32, states.size(), states[0].size()
@@ -164,8 +164,17 @@ A2CLearner::update(std::shared_ptr<Game> game) {
   std::tie(action_probs, values) = policy_net->forward(samples);
 
   // Calcluate losses
-  auto ff = -(torch::log(action_probs) * mcts_actions).sum({1});
-  torch::Tensor cross_entropy = (ff).sum({0});
+  torch::Tensor cross_entropy;
+  if (params["tough_ce"]) {
+    auto ff = -(torch::log(action_probs) * mcts_actions).sum({1});
+    cross_entropy = (ff).sum({0});
+  } else {
+    auto argmax_mcts_actions = mcts_actions.argmax({1});
+    cross_entropy = F::cross_entropy(
+        action_probs,
+        argmax_mcts_actions,
+        F::CrossEntropyFuncOptions().reduction(torch::kSum));
+  }
 
   torch::Tensor value_loss = F::smooth_l1_loss(
       values.reshape(-1),

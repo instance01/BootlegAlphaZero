@@ -7,12 +7,13 @@
 #include "tensorboard_util.hpp"
 #include "simple_thread_pool.hpp"
 #include "cfg.hpp"
+#include "lr_scheduler.hpp"
 
 
-std::pair<int, double> evaluate(Env env, json params, A2CLearner a2c_agent) {
+std::pair<int, double> evaluate(EnvWrapper env, json params, A2CLearner a2c_agent) {
   env = *env.clone();
 
-  std::vector<int> state = env.reset();
+  std::vector<float> state = env.reset();
 
   bool done = false;
   double total_reward = 0.;
@@ -42,8 +43,8 @@ std::pair<int, double> evaluate(Env env, json params, A2CLearner a2c_agent) {
   return std::make_pair(actions.length(), total_reward);
 }
 
-std::shared_ptr<Game> run_actor(Env orig_env, json params, MCTS mcts_agent, A2CLearner a2c_agent) {
-  Env env = *orig_env.clone();
+std::shared_ptr<Game> run_actor(EnvWrapper orig_env, json params, MCTS mcts_agent, A2CLearner a2c_agent) {
+  EnvWrapper env = *orig_env.clone();
   auto state = env.reset();
 
   // TODO Make sure this is a good idea to init here.
@@ -66,7 +67,7 @@ std::shared_ptr<Game> run_actor(Env orig_env, json params, MCTS mcts_agent, A2CL
     torch::Tensor action_probs;
     std::tie(action_probs, std::ignore) = a2c_agent.predict_policy({state});
 
-    std::vector<int> next_state;
+    std::vector<float> next_state;
     double reward;
     std::tie(next_state, reward, done) = env.step(sampled_action);
 
@@ -103,12 +104,13 @@ T mean(std::vector<T> &v)
 std::pair<int, double> episode(
   TensorBoardLogger &writer,
   int n_run,
-  Env env,
+  EnvWrapper env,
   MCTS mcts_agent,
   A2CLearner a2c_agent,
   int n_episode,
   ReplayBuffer replay_buffer,
   json params,
+  LRScheduler *lr_scheduler,
   std::chrono::time_point<std::chrono::high_resolution_clock> start_time
 ) {
   a2c_agent.policy_net->eval();
@@ -180,10 +182,11 @@ std::pair<int, double> episode(
     losses.push_back(loss.item<double>());
   }
 
-  // TODO LR Scheduler
-  //if (*std::get_if<bool>(&params["schedule_alpha"])) {
-  //  a2c_agent.scheduler->step();
-  //}
+  auto& options = static_cast<torch::optim::AdamOptions&>(a2c_agent.policy_optimizer->param_groups()[0].options());
+  auto lr = options.lr();
+  if (params["schedule_alpha"]) {
+    options.lr(lr_scheduler->step(lr, n_episode));
+  }
 
   std::cout << std::endl;
 
@@ -215,11 +218,7 @@ std::pair<int, double> episode(
 
   // The decision to only use the first param group might be dubious.
   // Keep that in mind. For now it is fine, I checked.
-  auto& options = static_cast<torch::optim::AdamOptions&>(a2c_agent.policy_optimizer->param_groups()[0].options());
-  auto lr = options.lr();
   std::cout << "LR " << lr << std::endl;
-  // TODO FOR LR SCHEDULING LATER:
-  //options.lr(1.0);
 
   writer.add_scalar("Train/LearningRate/" + std::to_string(n_run), n_episode, lr);
   writer.add_scalar("Train/AvgLoss/" + std::to_string(n_run), n_episode, avg_loss);
@@ -229,7 +228,7 @@ std::pair<int, double> episode(
   return {eval_length, total_reward};
 }
 
-std::tuple<int, int, double> run(Env env, json params, int n_run, TensorBoardLogger writer) {
+std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorBoardLogger &writer) {
   std::ostringstream oss;
   oss << params.dump();
   writer.add_text("Info/params/" + std::to_string(n_run), 0, oss.str().c_str());
@@ -241,6 +240,15 @@ std::tuple<int, int, double> run(Env env, json params, int n_run, TensorBoardLog
   );
   auto a2c_agent = A2CLearner(params, env);
   auto mcts_agent = MCTS(env, a2c_agent, params);
+  LRScheduler *lr_scheduler;
+  if (params["scheduler_class"] == "exp") {
+    lr_scheduler = new ExponentialScheduler(params["scheduler_factor"]);
+  } else if (params["scheduler_class"] == "step") {
+    lr_scheduler = new StepScheduler(
+        params["scheduler_steps"],
+        params["scheduler_factor"]
+    );
+  }
 
   // Need to have less than or equal desired evaluation length, certain times in a row.
   bool is_done_stably = 0;
@@ -261,6 +269,7 @@ std::tuple<int, int, double> run(Env env, json params, int n_run, TensorBoardLog
         i,
         replay_buffer,
         params,
+        lr_scheduler,
         start_time
     );
 
@@ -273,6 +282,7 @@ std::tuple<int, int, double> run(Env env, json params, int n_run, TensorBoardLog
     if (is_done_stably > n_desired_eval_len)
         break;
   }
+  delete lr_scheduler;
   return std::make_tuple(i, eval_len, total_reward);
 }
 
@@ -286,10 +296,11 @@ int main(int argc, char* argv[]) {
 
   auto params = load_cfg(param_num);
 
-  Env env = Env();
+  EnvWrapper env = EnvWrapper();
   env.init(game, params);
 
   TensorBoardLogger writer(gen_log_filename(game, param_num).c_str());
 
-  run(env, params, 0, writer);
+  for (int i = 0; i < params["n_runs"]; ++i)
+    run(env, params, i, writer);
 }

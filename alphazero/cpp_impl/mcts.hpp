@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include <torch/torch.h>
-#include "env.hpp"
+#include "env_wrapper.hpp"
 #include "a2c.hpp"
 #include "cfg.hpp"
 
@@ -20,9 +20,9 @@ class Node {
     int action;
     double Q = 0.;
     int visits = 0;
-    std::vector<int> state;
+    std::vector<float> state;
     torch::Tensor torch_state;
-    std::shared_ptr<Env> env;
+    std::shared_ptr<EnvWrapper> env;
 
     // TODO Increase that?
     Node() : _id(std::rand() % 2147483648) {};
@@ -39,12 +39,12 @@ class MCTS {
     A2CLearner a2c_agent;
     // shared_ptr because unique_ptr makes this class uncopyable.
     // And I don't want to define a custom copy function.
-    std::shared_ptr<Env> env;
+    std::shared_ptr<EnvWrapper> env;
     std::shared_ptr<Node> root_node;
 
-    std::map<std::vector<int>, torch::Tensor> policy_net_cache;
+    std::unordered_map<std::shared_ptr<Node>, torch::Tensor> policy_net_cache;
 
-    MCTS(Env env, A2CLearner a2c_agent, json params);
+    MCTS(EnvWrapper env, A2CLearner a2c_agent, json params);
     MCTS() {};
     ~MCTS() {};
 
@@ -55,6 +55,6 @@ class MCTS {
     std::shared_ptr<Node> select_expand();
     void backup(std::shared_ptr<Node> curr_node, double Q_val);
     void reset_policy_cache();
-    std::vector<double> policy(Env env, std::vector<int> obs, bool ret_node=false);
+    std::vector<double> policy(EnvWrapper env, std::vector<float> obs, bool ret_node=false);
 };
 #endif
