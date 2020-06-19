@@ -9,7 +9,7 @@ from multiprocessing import set_start_method
 import gym
 import numpy as np
 
-import mini_envs.discrete_envs.mini_discrete_env  # noqa: F401
+#import mini_envs.discrete_envs.mini_discrete_env  # noqa: F401
 import gym_minigrid  # noqa: F401
 import alphazero
 from torch.utils.tensorboard import SummaryWriter
@@ -1069,6 +1069,20 @@ def get_params():
         "n_actors": 20  # 30 -> 20
     })
 
+    paramsPROF = copy.deepcopy(params81)
+    paramsPROF.update({
+        "horizon": 100,#  1024,
+        "n_procs": 1,
+        "alpha": .001,
+        "simulations": 50,
+        "prioritized_sampling": True,
+        "n_actors": 1,
+        "train_steps": 1,
+        "dirichlet_alpha": .3,
+        "dirichlet_frac": .5,
+        "episodes": 1,
+    })
+
     return {
         "1": params1,
         "2": params2,
@@ -1665,7 +1679,11 @@ Params75:
     Very fast, and we could do more episodes!
 
 Params76:
-    Running (zirkon)
+    Jun10_16-31-40_rubin.cip.ifi.lmu.de
+    Minutes: ~4500
+    Only managed to learn 1 (!)
+    Learnt 1/1. Second one did not learn anything, crashed before max episodes.
+    Huge net architecture slows everything down insanely.
 
 Params77:
     Jun03_22-18-44_goshenit.cip.ifi.lmu.de
@@ -1687,7 +1705,10 @@ Params68: (16x16)
 // moved here for visibility
 Params63: (16x16)
     +set_start_method("spawn")
-    Running (heliodor)
+    Jun10_16-36-40_tansanit.cip.ifi.lmu.de
+    Minutes: ~4740
+    Learnt 0/1.
+    Same problem as params76: Huge net architecture slows down.
 
 +Python performance improvements (~2.5x)
 
@@ -1769,50 +1790,89 @@ Params89:
 
 Params81_again:
     just a sanity check whether it's really that fast.
-    Running (beryll)
+    Jun10_16-18-27_zirkon.cip.ifi.lmu.de
+    Minutes: ~1020
+    Learnt 10/10.
+    It's super fast. Nice.
 
 Params90:  // 84 but with 500 episodes
-    Running (sodalith)
-
-Params81_MTCAR:
-    Running (indigiolith)
+    Jun10_16-22-54_saphir.cip.ifi.lmu.de
+    Minutes: ~1620
+    Learnt 10/10.
 
 // From now on, MTCAR.
+// Bad means no good rewards. Ok means a few ok rewards, could nearly be
+// considered a success. Good means a success.
+
+Params81_MTCAR:
+    Jun10_16-25-10_diamant.cip.ifi.lmu.de
+    Minutes: ~4300
+    Bad: 7; Ok: 3; Good: 0;
+    Bad ones were mostly flat lines. Ok ones become flat.
 
 Params91:
-    Running (euklas)
+    Jun10_16-27-06_goshenit.cip.ifi.lmu.de
+    Minutes: ~4300
+    Bad: 6; Ok: 4; Good: 0;
+    Bad ones were mostly flat lines. Ok ones become flat.
 
 Params92:
-    Running (peridot)
+    Jun10_16-30-39_hackmannit.cip.ifi.lmu.de
+    Minutes: ~3600
+    Bad: 4; Ok: 1; Good: 0;
+    Not enough time to finish.
 
 Params93:
-    Running (petalit)
+    Jun10_16-31-10_rubellit.cip.ifi.lmu.de
+    Minutes: ~3600
+    Bad: 4; Ok: 1; Good: 0;
+    Not enough time to finish.
 
 Params94:
-    Running (goshenit)
+    Jun10_16-45-18_thulit.cip.ifi.lmu.de
+    Minutes: ~3600
+    Bad: 3; Ok: 1; Good: 0;
+    Not enough time to finish.
 
 Params95:
-    Running (amazonit)
+    Jun10_16-17-09_hambergit.cip.ifi.lmu.de
+    Minutes: ~3600
+    Bad: 4; Ok: 1; Good: 0;
+    Not enough time to finish.
 
 Params96:
-    Running
+    Jun10_20-06-55_peridot.cip.ifi.lmu.demtcar.96
+    Minutes: ~3600
+    Bad: 4; Ok: 0; Good: (1);
+    One that is nearly good. Not enough time to finish.
 
 Params97:
-    Running
+    Jun10_20-08-05_pyrit.cip.ifi.lmu.de-mtcar.97
+    Minutes: ~3600
+    Bad: 5; Ok: 0; Good: 0;
+    No good.
 
 Params98:
-    Running
+    Jun10_20-08-05_rhodonit.cip.ifi.lmu.de-mtcar.98
+    Minutes: ~3600
+    Bad: 4; Ok: 1; Good: 0;
+    Not enough time to finish.
 
 Params99:
-    Running
+    Jun10_20-08-07_smaragd.cip.ifi.lmu.de-mtcar.99
+    Minutes: ~3600
+    Bad: 4; Ok: 1; Good: 0;
+    Not enough time to finish.
 
 Params100:
-    Running
+    Jun10_20-08-05_feuerachat.cip.ifi.lmu.de-mtcar.100
+    Minutes: ~4080
+    Bad: 9; Ok: 1; Good: 0;
+    Pretty bad. But fast.
 
 TODO:
     Explore more lr schedules
     Explore more net architectures
-    87 explore MultiStep some more
 
 CURRENT BEST:
 Params41 prio=True
