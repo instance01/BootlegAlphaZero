@@ -1,14 +1,14 @@
-#ifndef GRIDWORLD_HEADER
-#define GRIDWORLD_HEADER
+#ifndef MTCAR_HEADER
+#define MTCAR_HEADER
 #include <tuple>
 #include <utility>
 #include <vector>
 #include <set>
 #include <random>
+#include "env.hpp"
 
 
-// TODO Polymorphism. Define step, reset
-class MtCarEnv {
+class MtCarEnv : public Env {
   public:
     // Constants
     float min_position = -1.2;
@@ -17,25 +17,19 @@ class MtCarEnv {
     float goal_position = 0.5;
     float force = 0.001;
     float gravity = 0.0025;
-    int max_steps;
+    int max_steps = 200;
 
     // Variable
-    float goal_velocity;
+    float goal_velocity = 0;
 
     // State
-    int steps;
+    int steps = 0;
     std::vector<float> state; // contains position, velocity.
-
-    // For A2C. Just needs to be rough.
-    std::vector<float> expected_mean;
-    std::vector<float> expected_stddev;
-
-    // Due to predictably small size no need for hashing (unordered_set)
-    std::set<std::pair<int, int>> blocks;
 
     std::mt19937 generator;
 
     MtCarEnv() {};
+    MtCarEnv(MtCarEnv &other);
     MtCarEnv(float goal_velocity);
     ~MtCarEnv() {};
 

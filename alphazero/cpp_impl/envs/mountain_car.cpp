@@ -6,6 +6,14 @@
 #include "mountain_car.hpp"
 
 
+MtCarEnv::MtCarEnv(MtCarEnv &other) {
+  max_steps = other.max_steps;
+  goal_velocity = other.goal_velocity;
+  steps = other.steps;
+  state = other.state;
+  generator = other.generator;
+}
+
 MtCarEnv::MtCarEnv(float goal_velocity) : goal_velocity(goal_velocity) {
   std::random_device rd;
   generator = std::mt19937(rd());
@@ -19,18 +27,20 @@ MtCarEnv::MtCarEnv(float goal_velocity) : goal_velocity(goal_velocity) {
 
 std::vector<float>
 MtCarEnv::reset() {
+  steps = 0;
   std::uniform_real_distribution<float> distribution(-.6, -.4);
   state = {
     distribution(generator),
-    distribution(generator)
+    0.
   };
   return state;
 }
 
 std::tuple<std::vector<float>, double, bool>
 MtCarEnv::step(int action) {
+  steps += 1;
   if (steps >= max_steps) {
-    return std::make_tuple(state, 0, true);
+    return std::make_tuple(state, 0.0, true);
   }
 
   float position = state[0];

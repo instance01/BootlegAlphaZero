@@ -5,6 +5,18 @@
 #include <iostream>
 
 
+GridWorldEnv::GridWorldEnv(GridWorldEnv &other) {
+  start = other.start;
+  goal = other.goal;
+  pos = other.pos;
+  dir = other.dir;
+  width = other.width;
+  height = other.height;
+  max_steps = other.max_steps;
+  steps = other.steps;
+  blocks = other.blocks;
+}
+
 GridWorldEnv::GridWorldEnv(
     int width, int height, std::set<std::pair<int, int>> blocks
 ) : width(width), height(height), blocks(blocks) {
@@ -54,7 +66,7 @@ GridWorldEnv::move(int action) {
   }
 }
 
-std::vector<int>
+std::vector<float>
 GridWorldEnv::reset() {
   start = std::make_pair(1, 1);
   goal = std::make_pair(width - 2, height - 2);
@@ -62,13 +74,13 @@ GridWorldEnv::reset() {
   pos = std::make_pair(1, 1);
   steps = 0;
 
-  return {1, 1, 0};
+  return {1., 1., 0.};
 }
 
-std::tuple<std::vector<int>, double, bool>
+std::tuple<std::vector<float>, double, bool>
 GridWorldEnv::step(int action) {
   if (steps >= max_steps) {
-    std::vector<int> obs = {pos.first, pos.second, dir};
+    std::vector<float> obs = {(float) pos.first, (float) pos.second, (float) dir};
     auto ret = std::make_tuple(obs, 0, true);
     return ret;
   }
@@ -81,7 +93,7 @@ GridWorldEnv::step(int action) {
     done = true;
     reward = 1. - .9 * (1. * steps / max_steps);
   }
-  std::vector<int> obs = {pos.first, pos.second, dir};
+  std::vector<float> obs = {(float) pos.first, (float) pos.second, (float) dir};
   auto ret = std::make_tuple(obs, reward, done);
   return ret;
 }

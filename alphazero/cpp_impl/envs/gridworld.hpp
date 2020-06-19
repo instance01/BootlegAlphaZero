@@ -4,10 +4,10 @@
 #include <utility>
 #include <vector>
 #include <set>
+#include "env.hpp"
 
 
-// TODO Polymorphism. Define step, reset
-class GridWorldEnv {
+class GridWorldEnv : public Env {
   public:
     std::pair<int, int> start;
     std::pair<int, int> goal;
@@ -19,19 +19,16 @@ class GridWorldEnv {
     int max_steps;
     int steps;
 
-    // For A2C. Just needs to be rough.
-    std::vector<float> expected_mean;
-    std::vector<float> expected_stddev;
-
     // Due to predictably small size no need for hashing (unordered_set)
     std::set<std::pair<int, int>> blocks;
 
     GridWorldEnv() {};
     GridWorldEnv(int width, int height, std::set<std::pair<int, int>> blocks);
     ~GridWorldEnv() {};
+    GridWorldEnv(GridWorldEnv &other);
 
     void move(int action);
-    std::vector<int> reset();
-    std::tuple<std::vector<int>, double, bool> step(int action);
+    std::vector<float> reset();
+    std::tuple<std::vector<float>, double, bool> step(int action);
 };
 #endif
