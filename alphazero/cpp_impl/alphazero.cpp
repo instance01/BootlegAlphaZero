@@ -160,7 +160,10 @@ std::pair<int, double> episode(
     }
   }
   //std::cout << std::endl;
-  std::cout << "CONFIDENCE " << mean<double>(max_action_probs) << " " << median<double>(max_action_probs) << std::endl;
+  auto mcts_confidence_mean = mean<double>(max_action_probs);
+  auto mcts_confidence_median = median<double>(max_action_probs);
+  std::cout << "CONFIDENCE " << mcts_confidence_mean << " " << mcts_confidence_median << std::endl;
+  writer.add_scalar("Eval/MCTS_Confidence/" + std::to_string(n_run), n_episode, (float) mcts_confidence_median);
 
   // Train network after self play.
   std::vector<int> sample_lens;
