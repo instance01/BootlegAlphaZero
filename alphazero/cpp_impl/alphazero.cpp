@@ -262,7 +262,7 @@ std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorB
   }
 
   // Need to have less than or equal desired evaluation length, certain times in a row.
-  bool is_done_stably = 0;
+  int is_done_stably = 0;
   int desired_eval_len = params["desired_eval_len"];
   int n_desired_eval_len = params["n_desired_eval_len"];
 
@@ -270,7 +270,7 @@ std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorB
   double total_reward;
   int i = 0;
   for (; i < params["episodes"]; ++i) {
-    std::cout << "EPS " << i << std::endl;
+    std::cout << "Episode " << i << std::endl;
     std::tie(eval_len, total_reward) = episode(
         writer,
         n_run,
