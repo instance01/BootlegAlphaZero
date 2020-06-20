@@ -13,8 +13,9 @@ class LRScheduler {
 class ExponentialScheduler : public LRScheduler {
   public:
     float factor;
+    float min_lr;
 
-    ExponentialScheduler(float factor) : factor(factor) {};
+    ExponentialScheduler(float factor, float min_lr) : factor(factor), min_lr(min_lr) {};
     ~ExponentialScheduler() {};
 
     float step(float lr_before, int eps, double eval_reward);
@@ -24,8 +25,10 @@ class StepScheduler : public LRScheduler {
   public:
     std::vector<int> step_downs;
     float factor;
+    float min_lr;
 
-    StepScheduler(std::vector<int> step_downs, float factor) : step_downs(step_downs), factor(factor) {};
+    StepScheduler(std::vector<int> step_downs, float factor, float min_lr)
+      : step_downs(step_downs), factor(factor), min_lr(min_lr) {};
     ~StepScheduler() {};
 
     float step(float lr_before, int eps, double eval_reward);
@@ -36,11 +39,12 @@ class ReduceOnGoodEval : public LRScheduler {
     double min_good_eval;
     int min_n_good_evals;
     float factor;
+    float min_lr;
 
     int n_good_evals;
 
-    ReduceOnGoodEval(float factor, double min_good_eval, int min_n_good_evals)
-      : min_good_eval(min_good_eval), min_n_good_evals(min_n_good_evals), factor(factor) {};
+    ReduceOnGoodEval(float factor, double min_good_eval, int min_n_good_evals, float min_lr)
+      : min_good_eval(min_good_eval), min_n_good_evals(min_n_good_evals), factor(factor), min_lr(min_lr) {};
     ~ReduceOnGoodEval() {};
 
     float step(float lr_before, int eps, double eval_reward);

@@ -247,17 +247,22 @@ std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorB
   auto mcts_agent = MCTS(env, a2c_agent, params);
   LRScheduler *lr_scheduler;
   if (params["scheduler_class"] == "exp") {
-    lr_scheduler = new ExponentialScheduler(params["scheduler_factor"]);
+    lr_scheduler = new ExponentialScheduler(
+        params["scheduler_factor"],
+        params["scheduler_min_lr"]
+    );
   } else if (params["scheduler_class"] == "step") {
     lr_scheduler = new StepScheduler(
         params["scheduler_steps"],
-        params["scheduler_factor"]
+        params["scheduler_factor"],
+        params["scheduler_min_lr"]
     );
   } else if (params["scheduler_class"] == "reduce_eval") {
     lr_scheduler = new ReduceOnGoodEval(
         params["scheduler_factor"],
         params["scheduler_min_good_eval"],
-        params["scheduler_min_n_good_evals"]
+        params["scheduler_min_n_good_evals"],
+        params["scheduler_min_lr"]
     );
   }
 

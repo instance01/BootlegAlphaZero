@@ -32,6 +32,7 @@ json get_default(std::string base) {
       {"schedule_alpha", false},
       {"scheduler_class", "exp"},  // exp, step
       {"scheduler_factor", .995},
+      {"scheduler_min_lr", .000001},
       {"scheduler_steps", {100, 200}},
       {"scheduler_min_good_eval", -120.0},
       {"scheduler_min_n_good_evals", 20},
@@ -75,6 +76,7 @@ json get_default(std::string base) {
       {"schedule_alpha", true},
       {"scheduler_class", "exp"},  // exp, step
       {"scheduler_factor", .995},
+      {"scheduler_min_lr", .000001},
       {"scheduler_steps", {100, 200}},
       {"scheduler_min_good_eval", -120.0},
       {"scheduler_min_n_good_evals", 20},
