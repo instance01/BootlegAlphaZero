@@ -70,6 +70,8 @@ A2CLearner::A2CLearner(json params, EnvWrapper &env) : params(params) {
 
   double lr = params["alpha"];
   auto opt = torch::optim::AdamOptions(lr);
+  if (params["use_weight_decay"])
+    opt.weight_decay(params["weight_decay"]);
   policy_optimizer = std::make_shared<torch::optim::Adam>(
       policy_net->parameters(),
       opt
