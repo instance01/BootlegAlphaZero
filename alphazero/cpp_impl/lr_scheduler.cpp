@@ -6,7 +6,7 @@ LRScheduler::~LRScheduler() {};
 
 
 float
-StepScheduler::step(float lr_before, int eps) {
+StepScheduler::step(float lr_before, int eps, double eval_reward) {
   for (auto step_down : step_downs) {
     if (eps >= step_down) {
       step_downs.erase(step_downs.begin());
@@ -17,6 +17,18 @@ StepScheduler::step(float lr_before, int eps) {
 }
 
 float
-ExponentialScheduler::step(float lr_before, int eps) {
+ExponentialScheduler::step(float lr_before, int eps, double eval_reward) {
   return lr_before * factor;
+}
+
+float
+ReduceOnGoodEval::step(float lr_before, int eps, double eval_reward) {
+  if (eval_reward > min_good_eval)
+    n_good_evals += 1;
+
+  if (n_good_evals > min_n_good_evals) {
+    n_good_evals = 0;
+    return lr_before * factor;
+  }
+  return lr_before;
 }

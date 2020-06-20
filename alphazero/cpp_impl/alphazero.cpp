@@ -185,12 +185,6 @@ std::pair<int, double> episode(
     losses.push_back(loss.item<double>());
   }
 
-  auto& options = static_cast<torch::optim::AdamOptions&>(a2c_agent.policy_optimizer->param_groups()[0].options());
-  auto lr = options.lr();
-  if (params["schedule_alpha"]) {
-    options.lr(lr_scheduler->step(lr, n_episode));
-  }
-
   std::cout << std::endl;
 
   a2c_agent.policy_net->eval();
@@ -207,6 +201,16 @@ std::pair<int, double> episode(
   double total_reward;
   std::tie(eval_length, total_reward) = evaluate(env, params, a2c_agent);
 
+  // The decision to only use the first param group might be dubious.
+  // Keep that in mind. For now it is fine, I checked.
+  auto& options = static_cast<torch::optim::AdamOptions&>(
+      a2c_agent.policy_optimizer->param_groups()[0].options()
+  );
+  auto lr = options.lr();
+  if (params["schedule_alpha"]) {
+    options.lr(lr_scheduler->step(lr, n_episode, total_reward));
+  }
+
   writer.add_scalar("Eval/Length/" + std::to_string(n_run), n_episode, (float) eval_length);
   writer.add_scalar("Eval/Reward/" + std::to_string(n_run), n_episode, total_reward);
   writer.add_histogram(
@@ -219,8 +223,6 @@ std::pair<int, double> episode(
       "Train/Loss/" + std::to_string(n_run), n_episode, losses
   );
 
-  // The decision to only use the first param group might be dubious.
-  // Keep that in mind. For now it is fine, I checked.
   std::cout << "LR " << lr << std::endl;
 
   writer.add_scalar("Train/LearningRate/" + std::to_string(n_run), n_episode, lr);
@@ -250,6 +252,12 @@ std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorB
     lr_scheduler = new StepScheduler(
         params["scheduler_steps"],
         params["scheduler_factor"]
+    );
+  } else if (params["scheduler_class"] == "reduce_eval") {
+    lr_scheduler = new ReduceOnGoodEval(
+        params["scheduler_factor"],
+        params["scheduler_min_good_eval"],
+        params["scheduler_min_n_good_evals"]
     );
   }
 

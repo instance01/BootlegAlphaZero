@@ -33,6 +33,8 @@ json get_default(std::string base) {
       {"scheduler_class", "exp"},  // exp, step
       {"scheduler_factor", .995},
       {"scheduler_steps", {100, 200}},
+      {"scheduler_min_good_eval", -120.0},
+      {"scheduler_min_n_good_evals", 20},
 
       // AlphaZero
       {"memory_capacity", 1000},
@@ -54,7 +56,7 @@ json get_default(std::string base) {
     }},
     {"81", {
       {"n_actions", 3},
-      {"n_input_features", 3},
+      {"n_input_features", 2},
       {"n_runs", 10},
 
       // MCTS
@@ -74,6 +76,8 @@ json get_default(std::string base) {
       {"scheduler_class", "exp"},  // exp, step
       {"scheduler_factor", .995},
       {"scheduler_steps", {100, 200}},
+      {"scheduler_min_good_eval", -120.0},
+      {"scheduler_min_n_good_evals", 20},
 
       // AlphaZero
       {"memory_capacity", 1000},
