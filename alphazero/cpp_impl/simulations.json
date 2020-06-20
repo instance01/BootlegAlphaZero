@@ -133,5 +133,18 @@
 
         "dirichlet_alpha": 0.5,
         "dirichlet_frac": 0.5
+    },
+    "116": {
+        "base": "81",
+        "pb_c_init": 0.15,
+        "scheduler_factor": 0.998,
+        "episodes": 900,
+        "use_weight_decay": true
+    },
+    "117": {
+        "base": "81",
+        "pb_c_init": 0.15,
+        "scheduler_factor": 0.998,
+        "episodes": 1000
     }
 }
