@@ -105,5 +105,33 @@
         "pb_c_init": 0.15,
         "scheduler_factor": 0.998,
         "episodes": 700
+    },
+    "113": {
+        "base": "81",
+        "pb_c_init": 0.15,
+        "episodes": 900,
+
+        "scheduler_class": "reduce_eval",
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_factor": 0.3
+    },
+    "114": {
+        "base": "81",
+        "pb_c_base": 1000,
+        "pb_c_init": 0.1,
+        "episodes": 900,
+
+        "scheduler_class": "reduce_eval",
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_factor": 0.3
+    },
+    "115": {
+        "base": "81",
+        "pb_c_init": 0.15,
+        "scheduler_factor": 0.998,
+        "episodes": 900,
+
+        "dirichlet_alpha": 0.5,
+        "dirichlet_frac": 0.5
     }
 }
