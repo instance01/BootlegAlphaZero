@@ -25,6 +25,8 @@ float
 ReduceOnGoodEval::step(float lr_before, int eps, double eval_reward) {
   if (eval_reward > min_good_eval)
     n_good_evals += 1;
+  else
+    n_good_evals = 0;
 
   if (n_good_evals > min_n_good_evals) {
     n_good_evals = 0;
