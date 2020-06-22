@@ -40,11 +40,12 @@ class ReduceOnGoodEval : public LRScheduler {
     int min_n_good_evals;
     float factor;
     float min_lr;
+    bool consecutive;
 
     int n_good_evals;
 
-    ReduceOnGoodEval(float factor, double min_good_eval, int min_n_good_evals, float min_lr)
-      : min_good_eval(min_good_eval), min_n_good_evals(min_n_good_evals), factor(factor), min_lr(min_lr) {};
+    ReduceOnGoodEval(float factor, double min_good_eval, int min_n_good_evals, float min_lr, bool consecutive)
+      : min_good_eval(min_good_eval), min_n_good_evals(min_n_good_evals), factor(factor), min_lr(min_lr), consecutive(consecutive) {};
     ~ReduceOnGoodEval() {};
 
     float step(float lr_before, int eps, double eval_reward);

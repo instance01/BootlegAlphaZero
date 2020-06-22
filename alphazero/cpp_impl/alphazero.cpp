@@ -262,7 +262,8 @@ std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorB
         params["scheduler_factor"],
         params["scheduler_min_good_eval"],
         params["scheduler_min_n_good_evals"],
-        params["scheduler_min_lr"]
+        params["scheduler_min_lr"],
+        params["scheduler_consecutive"]
     );
   }
 

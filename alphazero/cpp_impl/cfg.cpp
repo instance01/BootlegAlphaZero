@@ -36,6 +36,7 @@ json get_default(std::string base) {
       {"scheduler_steps", {100, 200}},
       {"scheduler_min_good_eval", -120.0},
       {"scheduler_min_n_good_evals", 15},
+      {"scheduler_consecutive", true},
       {"use_weight_decay", false},
       {"weight_decay", .00001},
 
