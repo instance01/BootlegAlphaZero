@@ -150,5 +150,27 @@
         "scheduler_class": "reduce_eval",
         "scheduler_min_good_eval": -110.0,
         "scheduler_factor": 0.3
+    },
+    "118": {
+        "base": "81",
+        "pb_c_base": 200,
+        "pb_c_init": 0.1,
+        "episodes": 1000,
+
+        "scheduler_class": "reduce_eval",
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_factor": 0.3,
+        "scheduler_consecutive": false
+    },
+    "119": {
+        "base": "81",
+        "pb_c_base": 1000,
+        "pb_c_init": 0.1,
+        "episodes": 1000,
+
+        "scheduler_class": "reduce_eval",
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_factor": 0.3,
+        "scheduler_consecutive": false
     }
 }
