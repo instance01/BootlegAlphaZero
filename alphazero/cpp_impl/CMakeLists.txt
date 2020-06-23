@@ -30,7 +30,7 @@ add_definitions("-lstdc++fs")
 set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE Release)
 
-add_executable(${PROJECT_NAME} alphazero.cpp a2c.cpp replay_buffer.cpp env_wrapper.cpp mcts.cpp tensorboard_util.cpp simple_thread_pool.cpp envs/gridworld.cpp envs/mountain_car.cpp envs/env.cpp cfg.cpp util.hpp lr_scheduler.cpp)
+add_executable(${PROJECT_NAME} alphazero.cpp a2c.cpp replay_buffer.cpp env_wrapper.cpp mcts.cpp tensorboard_util.cpp simple_thread_pool.cpp envs/gridworld.cpp envs/mountain_car.cpp envs/env.cpp cfg.cpp util.hpp lr_scheduler.cpp envs/cartpole.cpp)
 target_link_libraries(${PROJECT_NAME} "${TORCH_LIBRARIES}")
 target_link_libraries(${PROJECT_NAME} "stdc++fs")
 target_link_libraries(${PROJECT_NAME} "-ltensorboard_logger")
