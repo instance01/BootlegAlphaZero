@@ -4,6 +4,7 @@
 #include "env_wrapper.hpp"
 #include "envs/mountain_car.hpp"
 #include "envs/gridworld.hpp"
+#include "envs/cartpole.hpp"
 
 
 // TODO This should be templates at some point.
@@ -17,6 +18,8 @@ EnvWrapper::init(std::string game, json params) {
 
   if (game == "mtcar") {
     env = std::make_shared<MtCarEnv>(0.);
+  } else if (game == "cart") {
+    env = std::make_shared<CartPoleEnv>();
   } else {
     std::set<std::pair<int, int>> blocks;
     int width = 3;
@@ -60,6 +63,9 @@ EnvWrapper::clone() {
   if (game == "mtcar") {
     auto mtcar_env = std::static_pointer_cast<MtCarEnv>(env);
     env_->env = std::make_shared<MtCarEnv>(*mtcar_env);
+  } else if (game == "cart") {
+    auto cart_env = std::static_pointer_cast<CartPoleEnv>(env);
+    env_->env = std::make_shared<CartPoleEnv>(*cart_env);
   } else {
     auto grid_env = std::static_pointer_cast<GridWorldEnv>(env);
     env_->env = std::make_shared<GridWorldEnv>(*grid_env);
