@@ -5,7 +5,7 @@
 class LRScheduler {
   public:
     LRScheduler();
-    ~LRScheduler();
+    virtual ~LRScheduler();
 
     virtual float step(float lr_before, int eps, double eval_reward) {return 0;};
 };
@@ -36,13 +36,13 @@ class StepScheduler : public LRScheduler {
 
 class ReduceOnGoodEval : public LRScheduler {
   public:
-    double min_good_eval;
-    int min_n_good_evals;
-    float factor;
-    float min_lr;
-    bool consecutive;
+    double min_good_eval = -100.;
+    int min_n_good_evals = 10;
+    float factor = 0.5;
+    float min_lr = 0.000001;
+    bool consecutive = false;
 
-    int n_good_evals;
+    int n_good_evals = 0;
 
     ReduceOnGoodEval(float factor, double min_good_eval, int min_n_good_evals, float min_lr, bool consecutive)
       : min_good_eval(min_good_eval), min_n_good_evals(min_n_good_evals), factor(factor), min_lr(min_lr), consecutive(consecutive) {};

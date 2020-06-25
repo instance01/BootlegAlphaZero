@@ -127,12 +127,19 @@ std::pair<int, double> episode(
   auto lambda = [env, params, mcts_agent, a2c_agent]() -> std::shared_ptr<Game> {
     return run_actor(env, params, mcts_agent, a2c_agent);
   };
+  std::vector<Task*> tasks;
   for (int i = 0; i < n_actors; ++i) {
     Task *task = new Task(lambda);
     pool.add_task(task);
+    tasks.push_back(task);
   }
   std::vector<std::shared_ptr<Game>> games = pool.join();
   std::cout << std::endl << "# Games: " << games.size() << std::endl;
+
+  for (Task* task : tasks) {
+    delete task;
+  }
+  tasks.clear();
 
   for(auto game : games) {
     actor_lengths.push_back(game->states.size());
@@ -275,6 +282,7 @@ std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorB
   int eval_len;
   double total_reward;
   int i = 0;
+  //std::vector<double> rewards;
   for (; i < params["episodes"]; ++i) {
     std::cout << "Episode " << i << std::endl;
     std::tie(eval_len, total_reward) = episode(
@@ -289,6 +297,7 @@ std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorB
         lr_scheduler,
         start_time
     );
+    //rewards.push_back(total_reward);
 
     if (eval_len <= desired_eval_len) {
         is_done_stably += 1;
@@ -299,6 +308,13 @@ std::tuple<int, int, double> run(EnvWrapper env, json params, int n_run, TensorB
     if (is_done_stably > n_desired_eval_len)
         break;
   }
+
+  // writer.add_histogram(
+  //     "Summary/Rewards_All", n_run, rewards
+  // );
+  writer.add_scalar(
+      "Summary/Rewards_All_Single", n_run, total_reward
+  );
   delete lr_scheduler;
   return std::make_tuple(i, eval_len, total_reward);
 }
