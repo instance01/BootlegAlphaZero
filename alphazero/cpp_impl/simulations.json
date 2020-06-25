@@ -172,5 +172,67 @@
         "scheduler_min_good_eval": -110.0,
         "scheduler_factor": 0.3,
         "scheduler_consecutive": false
+    },
+    "PROF": {
+        "base": "81",
+        "n_actors": 2,
+        "episodes": 10
+    },
+    "PROF2": {
+        "base": "81",
+        "n_actors": 2,
+        "episodes": 1,
+        "n_runs": 1,
+        "train_steps": 100
+    },
+    "120": {
+        "base": "81",
+        "pb_c_base": 1000,
+        "pb_c_init": 0.1,
+        "episodes": 1000,
+
+        "scheduler_class": "reduce_eval",
+        "scheduler_min_good_eval": -100.0,
+        "scheduler_min_n_good_evals": 10,
+        "scheduler_factor": 0.5,
+        "scheduler_consecutive": false
+    },
+    "121": {
+        "base": "81",
+        "pb_c_base": 1000,
+        "pb_c_init": 0.1,
+        "episodes": 1000,
+
+        "scheduler_class": "reduce_eval",
+        "scheduler_min_good_eval": -100.0,
+        "scheduler_min_n_good_evals": 10,
+        "scheduler_factor": 0.5,
+        "scheduler_consecutive": false,
+
+        "use_weight_decay": true
+    },
+    "122": {
+        "base": "81",
+        "pb_c_base": 1000,
+        "pb_c_init": 0.05,
+        "episodes": 1000,
+
+        "scheduler_class": "reduce_eval",
+        "scheduler_min_good_eval": -100.0,
+        "scheduler_min_n_good_evals": 10,
+        "scheduler_factor": 0.5,
+        "scheduler_consecutive": false
+    },
+    "123": {
+        "base": "81",
+        "pb_c_base": 1000,
+        "pb_c_init": 0.1,
+        "episodes": 1000,
+
+        "scheduler_class": "reduce_eval",
+        "scheduler_min_good_eval": -100.0,
+        "scheduler_min_n_good_evals": 10,
+        "scheduler_factor": 0.5,
+        "scheduler_consecutive": false
     }
 }
