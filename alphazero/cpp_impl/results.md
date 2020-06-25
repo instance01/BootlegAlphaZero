@@ -24,3 +24,4 @@ Bad = B; Ok = K; Good = G
 | 121 | `Jun25-08:55:10-442-rubin.cip.ifi.lmu.de-mtcar-121` | | B: 0<br> K: 0<br> G: 0 | |
 | 122 | `Jun25-07:41:48-869-peridot.cip.ifi.lmu.de-mtcar-122` | | B: 0<br> K: 0<br> G: 0 | |
 | 123 | `Jun25-07:42:20-287-saphir.cip.ifi.lmu.de-mtcar-123` | | B: 0<br> K: 0<br> G: 0 | |
+| 124 | `Jun25-18:32:20-691-rhodonit.cip.ifi.lmu.de-mtcar-124` | | B: 0<br> K: 0<br> G: 0 | |
