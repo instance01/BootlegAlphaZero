@@ -34,7 +34,7 @@ class Task {
 
     template<typename Function>
     Task(Function && function) : func(function) { };
-    ~Task();
+    ~Task() {};
 };
 
 
