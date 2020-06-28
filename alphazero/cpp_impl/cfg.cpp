@@ -30,7 +30,7 @@ json get_default(std::string base) {
       {"alpha", .01},
       {"net_architecture", {64, 64}},
       {"schedule_alpha", false},
-      {"scheduler_class", "exp"},  // exp, step
+      {"scheduler_class", "exp"},  // exp, step, reduce_eval
       {"scheduler_factor", .995},
       {"scheduler_min_lr", .000001},
       {"scheduler_steps", {100, 200}},
@@ -77,12 +77,13 @@ json get_default(std::string base) {
       {"alpha", .001},
       {"net_architecture", {64, 64}},
       {"schedule_alpha", true},
-      {"scheduler_class", "exp"},  // exp, step
+      {"scheduler_class", "exp"},  // exp, step, reduce_eval
       {"scheduler_factor", .995},
       {"scheduler_min_lr", .000001},
       {"scheduler_steps", {100, 200}},
       {"scheduler_min_good_eval", -120.0},
       {"scheduler_min_n_good_evals", 20},
+      {"scheduler_consecutive", true},
       {"use_weight_decay", false},
       {"weight_decay", .00001},
 
@@ -95,6 +96,48 @@ json get_default(std::string base) {
       {"train_steps", 4000},  // 700000
       {"desired_eval_len", 8},
       {"n_desired_eval_len", 10},
+
+      // Other
+      {"reward_exponent", 1},
+    }},
+    {"120", {
+      {"n_actions", 3},
+      {"n_input_features", 2},
+      {"n_runs", 10},
+
+      // MCTS
+      {"gamma", .99},
+      {"simulations", 50},
+      {"horizon", 400},
+      {"dirichlet_alpha", .3},
+      {"dirichlet_frac", .5},
+      {"pb_c_base", 1000},
+      {"pb_c_init", .1},
+      {"tough_ce", true},
+
+      // A2C
+      {"alpha", .001},
+      {"net_architecture", {64, 64}},
+      {"schedule_alpha", true},
+      {"scheduler_class", "reduce_eval"},  // exp, step, reduce_eval
+      {"scheduler_factor", .5},
+      {"scheduler_min_lr", .000001},
+      {"scheduler_steps", {100, 200}},
+      {"scheduler_min_good_eval", -100.0},
+      {"scheduler_min_n_good_evals", 10},
+      {"scheduler_consecutive", false},
+      {"use_weight_decay", false},
+      {"weight_decay", .00001},
+
+      // AlphaZero
+      {"memory_capacity", 1000},
+      {"prioritized_sampling", false},
+      {"episodes", 1000},
+      {"n_procs", 8},
+      {"n_actors", 40},
+      {"train_steps", 4000},
+      {"desired_eval_len", 110},
+      {"n_desired_eval_len", 100},
 
       // Other
       {"reward_exponent", 1},
