@@ -141,7 +141,6 @@ A2CLearner::predict_policy(std::vector<std::vector<float>> states) {
   return policy_net->forward(samples);
 }
 
-
 torch::Tensor
 A2CLearner::update(std::shared_ptr<Game> game) {
   policy_net->train();
@@ -165,11 +164,11 @@ A2CLearner::update(std::shared_ptr<Game> game) {
   torch::Tensor values;
   std::tie(action_probs, values) = policy_net->forward(samples);
 
-  // Calcluate losses
+  // Calculate losses.
   torch::Tensor cross_entropy;
   if (params["tough_ce"]) {
-    auto ff = -(torch::log(action_probs) * mcts_actions).sum({1});
-    cross_entropy = (ff).sum({0});
+    auto err = -(torch::log(action_probs) * mcts_actions).sum({1});
+    cross_entropy = (err).sum({0});
   } else {
     auto argmax_mcts_actions = mcts_actions.argmax({1});
     cross_entropy = F::cross_entropy(
