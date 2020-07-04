@@ -238,5 +238,45 @@
         "pb_c_init": 0.05,
         "alpha": 0.002,
         "use_weight_decay": true
+    },
+    "129": {
+        "base": "120",
+        "pb_c_init": 0.01
+    },
+    "130": {
+        "base": "120",
+        "pb_c_base": 1600,
+        "pb_c_init": 0.01
+    },
+    "131": {
+        "base": "120",
+        "pb_c_base": 1600,
+        "pb_c_init": 0.01,
+        "dirichlet_alpha": 0.2,
+        "dirichlet_frac": 0.5
+    },
+    "132": {
+        "base": "120",
+        "pb_c_base": 1600,
+        "pb_c_init": 0.01,
+        "dirichlet_alpha": 0.1,
+        "dirichlet_frac": 0.5
+    },
+    "133": {
+        "base": "120",
+        "pb_c_base": 1600,
+        "pb_c_init": 0.01,
+        "dirichlet_alpha": 0.2,
+        "dirichlet_frac": 0.3
+    },
+    "134": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "net_architecture": [64, 64, 32]
+    },
+    "135": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "net_architecture": [64, 32]
     }
 }
