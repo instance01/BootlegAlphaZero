@@ -278,5 +278,15 @@
         "base": "120",
         "pb_c_init": 0.01,
         "net_architecture": [64, 32]
+    },
+    "136": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "scheduler_min_n_good_evals": 20
+    },
+    "137": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false
     }
 }
