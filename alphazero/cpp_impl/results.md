@@ -36,5 +36,5 @@ Bad = B; Ok = K; Good = G
 | 133 | `Jul05-05:37:54-302-rubin.cip.ifi.lmu.de-mtcar-133` | | B: 4<br> K: 2<br> G: 4 | Decreased Dirichlet (differently to 132). |
 | 134 | `Jul05-05:37:54-469-dioptas.cip.ifi.lmu.de-mtcar-134` | | B: 4<br> K: 3<br> G: 3 | Increased net architecture: `[64, 64, 32]` |
 | 135 | `Jul05-05:37:54-866-tigerauge.cip.ifi.lmu.de-mtcar-135` | | B: 8<br> K: 0<br> G: 2 | Decreased net architecture: `[64, 32]` |
-| 136 | `Jul06-15:34:07-753-katzenauge.cip.ifi.lmu.de-mtcar-136` | | B: 8<br> K: 1<br> G: 1 | Decreased `scheduler_min_n_good_evals` |
+| 136 | `Jul06-15:34:07-753-katzenauge.cip.ifi.lmu.de-mtcar-136` | | B: 8<br> K: 1<br> G: 1 | Increased `scheduler_min_n_good_evals` |
 | 137 | `Jul06-15:34:59-667-smaragd.cip.ifi.lmu.de-mtcar-137` | | B: 6<br> K: 2<br> G: 2 | `tough_ce` set to false -> extremely stable per run. |

@@ -288,5 +288,94 @@
         "base": "120",
         "pb_c_init": 0.01,
         "tough_ce": false
+    },
+    "138": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.2,
+        "dirichlet_frac": 0.3
+    },
+    "139": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.5,
+        "dirichlet_frac": 0.3
+    },
+    "140": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.5,
+        "dirichlet_frac": 0.5
+    },
+    "141": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.4,
+        "dirichlet_frac": 0.5,
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_min_n_good_evals": 20
+    },
+    "142": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_min_n_good_evals": 20
+    },
+    "143": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_min_n_good_evals": 10
+    },
+    "144": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.4,
+        "dirichlet_frac": 0.5,
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_min_n_good_evals": 10
+    },
+    "145": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_min_n_good_evals": 10,
+        "alpha": 0.0005
+    },
+    "146": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_min_n_good_evals": 20,
+        "alpha": 0.0005
+    },
+    "147": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.4,
+        "dirichlet_frac": 0.5,
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_min_n_good_evals": 20,
+        "alpha": 0.0005
+    },
+    "148": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.4,
+        "dirichlet_frac": 0.5,
+        "scheduler_min_good_eval": -110.0,
+        "scheduler_min_n_good_evals": 20,
+        "alpha": 0.0002
     }
 }
