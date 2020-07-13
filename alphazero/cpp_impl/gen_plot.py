@@ -22,8 +22,8 @@ def smooth(y, box_pts):
 def aggregate(path):
     keys = [
         'Eval/Reward',
-        'Eval/Length',
-        'Eval/MCTS_Confidence',
+        # 'Eval/Length',
+        # 'Eval/MCTS_Confidence',
         'Train/AvgLoss'
     ]
 

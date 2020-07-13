@@ -377,5 +377,13 @@
         "scheduler_min_good_eval": -110.0,
         "scheduler_min_n_good_evals": 20,
         "alpha": 0.0002
+    },
+    "149": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.5,
+        "dirichlet_frac": 0.5,
+        "alpha": 0.0001
     }
 }
