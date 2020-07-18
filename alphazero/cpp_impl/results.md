@@ -38,3 +38,15 @@ Bad = B; Ok = K; Good = G
 | 135 | `Jul05-05:37:54-866-tigerauge.cip.ifi.lmu.de-mtcar-135` | | B: 8<br> K: 0<br> G: 2 | Decreased net architecture: `[64, 32]` |
 | 136 | `Jul06-15:34:07-753-katzenauge.cip.ifi.lmu.de-mtcar-136` | | B: 8<br> K: 1<br> G: 1 | Increased `scheduler_min_n_good_evals` |
 | 137 | `Jul06-15:34:59-667-smaragd.cip.ifi.lmu.de-mtcar-137` | | B: 6<br> K: 2<br> G: 2 | `tough_ce` set to false -> extremely stable per run. |
+| 138 | `Jul12-09:08:05-882-petalit.cip.ifi.lmu.de-mtcar-138` | | B: 7<br> K: 1<br> G: 2 | Decreased Dirichlet |
+| 139 | `Jul12-09:08:05-107-katzenauge.cip.ifi.lmu.de-mtcar-139` | | B: 8<br> K: 0<br> G: 2 | Decreased Dirichlet |
+| 140 | `Jul12-09:09:04-831-smaragd.cip.ifi.lmu.de-mtcar-140` | | B: 0<br> K: 9<br> G: 1 | Increased Dirichlet. Very strangely this one was consistently at roughly -115 reward. |
+| 141 | `Jul12-09:09:21-715-sodalith.cip.ifi.lmu.de-mtcar-141` | | B: 1<br> K: 9<br> G: 0 | Adapted min good eval scheduler. Increased Dirichlet. |
+| 142 | `Jul12-09:09:52-81-tansanit.cip.ifi.lmu.de-mtcar-142` | | B: 8<br> K: 2<br> G: 0 | Adapted min good eval scheduler. Decreased Dirichlet. |
+| 143 | `Jul12-09:09:53-654-rubellit.cip.ifi.lmu.de-mtcar-143` | | B: 5<br> K: 4<br> G: 1 | Slightly relaxed min good eval scheduler. |
+| 144 | `Jul12-09:09:53-775-rubin.cip.ifi.lmu.de-mtcar-144` | | B: 6<br> K: 2<br> G: 2 | Same as 143 but with increased Dirichlet |
+| 145 | `Jul12-09:10:16-496-tigerauge.cip.ifi.lmu.de-mtcar-145` | | B: 8<br> K: 2<br> G: 0 | Same as 144 but decreased alpha. |
+| 146 | `Jul12-09:10:16-337-thulit.cip.ifi.lmu.de-mtcar-146` | | B: 9<br> K: 1<br> G: 0 | Same as 145 but tougher min good eval scheduler. |
+| 147 | `Jul12-09:10:16-911-vesuvianit.cip.ifi.lmu.de-mtcar-147` | | B: 0<br> K: 1<br> G: 0 | Crashed.. |
+| 148 | `Jul12-09:10:16-29-topas.cip.ifi.lmu.de-mtcar-148` | | B: 5<br> K: 3<br> G: 2 | Lower alpha |
+| 149 | `Jul13-20:10:25-918-vesuvianit.cip.ifi.lmu.de-mtcar-149` | | B: 1<br> K: 1<br> G: 0 | Crashed.. Could be issue with vesuvianit |
