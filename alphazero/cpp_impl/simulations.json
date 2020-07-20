@@ -425,5 +425,31 @@
         "dirichlet_alpha": 0.5,
         "dirichlet_frac": 0.5,
         "memory_capacity": 2000
+    },
+    "155": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.9,
+        "dirichlet_frac": 0.5,
+        "memory_capacity": 2000
+    },
+    "156": {
+        "base": "120",
+        "pb_c_init": 0.01,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.5,
+        "dirichlet_frac": 0.5,
+        "memory_capacity": 2000,
+        "episodes": 1300,
+        "simulations": 40
+    },
+    "157": {
+        "base": "120",
+        "pb_c_init": 0.15,
+        "tough_ce": false,
+        "dirichlet_alpha": 0.9,
+        "dirichlet_frac": 0.5,
+        "memory_capacity": 2000
     }
 }
