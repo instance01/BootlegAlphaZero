@@ -15,7 +15,7 @@ ExternalProject_Add(tensorboard_logger
 )
 
 
-list(APPEND CMAKE_PREFIX_PATH "/app/dist/libtorch")
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/dist/libtorch")
 
 find_package(Protobuf REQUIRED)
 find_package(Torch REQUIRED)
